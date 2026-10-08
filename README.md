@@ -104,3 +104,7 @@ In Cloud Run, the backend automatically inherits permissions from its attached *
    npm install
    npm run dev
    ```
+
+## Production Deployment (Google Cloud Run)
+
+For complete step-by-step instructions on deploying the CareerLens backend container to Google Cloud Run with Artifact Registry and Vertex AI runtime IAM permissions, refer to the [Deployment Guide](DEPLOYMENT.md).

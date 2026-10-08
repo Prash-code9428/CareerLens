@@ -1,6 +1,10 @@
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 /**
  * Google Cloud Vertex AI Configuration
@@ -10,9 +14,15 @@ dotenv.config();
  * - Cloud Run production: Attached Service Account / Workload Identity
  */
 export const googleCloudConfig = {
-  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID || '',
-  location: process.env.VERTEX_AI_LOCATION || 'us-central1',
-  model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-pro'
+  get projectId() {
+    return process.env.GOOGLE_CLOUD_PROJECT_ID || '';
+  },
+  get location() {
+    return process.env.VERTEX_AI_LOCATION || 'us-central1';
+  },
+  get model() {
+    return process.env.VERTEX_AI_MODEL || 'gemini-1.5-pro';
+  }
 };
 
 /**

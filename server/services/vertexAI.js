@@ -37,19 +37,30 @@ export const getVertexAIClient = () => {
  */
 export const getGenerativeModel = (options = {}) => {
   const vertexAI = getVertexAIClient();
-  const modelName = options.model || googleCloudConfig.model;
+  const modelName = options.model || googleCloudConfig.model || 'gemini-1.5-pro';
+
+  const {
+    model: _unusedModel,
+    temperature,
+    maxOutputTokens,
+    responseMimeType,
+    responseSchema,
+    generationConfig,
+    systemInstruction,
+    ...restOptions
+  } = options;
 
   return vertexAI.getGenerativeModel({
     model: modelName,
     generationConfig: {
-      temperature: options.temperature ?? 0.2,
-      maxOutputTokens: options.maxOutputTokens ?? 4096,
-      responseMimeType: options.responseMimeType || 'application/json',
-      ...(options.responseSchema && { responseSchema: options.responseSchema }),
-      ...options.generationConfig
+      temperature: temperature ?? 0.2,
+      maxOutputTokens: maxOutputTokens ?? 4096,
+      responseMimeType: responseMimeType || 'application/json',
+      ...(responseSchema && { responseSchema }),
+      ...generationConfig
     },
-    ...(options.systemInstruction && { systemInstruction: options.systemInstruction }),
-    ...options
+    ...(systemInstruction && { systemInstruction }),
+    ...restOptions
   });
 };
 

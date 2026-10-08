@@ -1,10 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Load environment variables from server root and project workspace root
 dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 export const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || 'resumes';
 
 let supabaseInstance = null;
@@ -20,7 +23,7 @@ export const validateSupabaseConfig = () => {
   return {
     isConfigured: missing.length === 0,
     missing,
-    bucket: SUPABASE_BUCKET
+    bucket: process.env.SUPABASE_BUCKET || 'resumes'
   };
 };
 
@@ -36,6 +39,9 @@ export const getSupabaseClient = () => {
       `Supabase storage error: Missing required environment variable(s): ${missing.join(', ')}`
     );
   }
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseInstance) {
     supabaseInstance = createClient(supabaseUrl, supabaseServiceKey, {

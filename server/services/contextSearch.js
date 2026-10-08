@@ -1,6 +1,6 @@
 import { generateStructuredContent } from './vertexAI.js';
 
-const CONTEXT_API_ENDPOINT = process.env.CONTEXT_API_ENDPOINT || 'https://api.context.dev/v1/search';
+const CONTEXT_API_ENDPOINT = process.env.CONTEXT_API_ENDPOINT || 'https://api.context.dev/v1/web/search';
 
 /**
  * Generate 3-5 focused search queries using Vertex AI based on candidate profile and preferences
@@ -86,6 +86,7 @@ Return JSON adhering to schema: { "queries": ["query 1", "query 2", "query 3"] }
  */
 export const searchContext = async (query) => {
   const apiKey = process.env.CONTEXT_API_KEY;
+  const endpoint = process.env.CONTEXT_API_ENDPOINT || 'https://api.context.dev/v1/web/search';
 
   if (!apiKey) {
     console.warn('⚠️ CONTEXT_API_KEY is not configured in environment variables.');
@@ -93,7 +94,7 @@ export const searchContext = async (query) => {
   }
 
   try {
-    const response = await fetch(CONTEXT_API_ENDPOINT, {
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -101,14 +102,13 @@ export const searchContext = async (query) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        query,
-        limit: 10
+        query
       }),
       signal: AbortSignal.timeout(12000)
     });
 
     if (!response.ok) {
-      console.error(`Context.dev search request returned HTTP status ${response.status}`);
+      console.error(`Context.dev search request (${endpoint}) returned HTTP status ${response.status}`);
       return [];
     }
 
@@ -117,8 +117,10 @@ export const searchContext = async (query) => {
     // Normalize response payload format across Context.dev response formats
     if (Array.isArray(data)) return data;
     if (Array.isArray(data?.results)) return data.results;
+    if (Array.isArray(data?.organic_results)) return data.organic_results;
     if (Array.isArray(data?.data)) return data.data;
     if (Array.isArray(data?.hits)) return data.hits;
+    if (Array.isArray(data?.items)) return data.items;
 
     return [];
   } catch (error) {
@@ -136,12 +138,29 @@ export const searchContext = async (query) => {
 export const normalizeOpportunity = (rawItem) => {
   if (!rawItem || typeof rawItem !== 'object') return null;
 
-  const url = (rawItem.url || rawItem.link || rawItem.source_url || rawItem.job_url || '').trim();
+  const url = (
+    rawItem.url ||
+    rawItem.link ||
+    rawItem.source_url ||
+    rawItem.job_url ||
+    rawItem.sourceUrl ||
+    rawItem.href ||
+    ''
+  ).trim();
+
   if (!url || (!url.startsWith('http://') && !url.startsWith('https://'))) {
     return null;
   }
 
-  const title = (rawItem.title || rawItem.job_title || rawItem.position || rawItem.name || '').trim();
+  const title = (
+    rawItem.title ||
+    rawItem.job_title ||
+    rawItem.position ||
+    rawItem.name ||
+    rawItem.headline ||
+    ''
+  ).trim();
+
   if (!title) return null;
 
   const company = (
@@ -149,7 +168,8 @@ export const normalizeOpportunity = (rawItem) => {
     rawItem.company_name ||
     rawItem.organization ||
     rawItem.employer ||
-    'Company'
+    rawItem.author ||
+    'Hiring Organization'
   ).trim();
 
   const description = (
@@ -157,6 +177,8 @@ export const normalizeOpportunity = (rawItem) => {
     rawItem.snippet ||
     rawItem.summary ||
     rawItem.content ||
+    rawItem.text ||
+    rawItem.body ||
     ''
   ).trim();
 
@@ -220,9 +242,14 @@ export const deduplicateOpportunities = (opportunities) => {
 };
 
 /**
+ * Helper to pause execution for a given number of milliseconds
+ */
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
  * Orchestrate complete live opportunity discovery:
  * 1. Vertex AI generates 3-5 queries
- * 2. Context.dev searches live web
+ * 2. Context.dev searches live web sequentially to respect rate limits
  * 3. Normalizes and deduplicates results
  * 
  * @param {Object} candidateProfile - Extracted candidate profile
@@ -233,21 +260,22 @@ export const discoverOpportunities = async (candidateProfile, userPreferences = 
   // Step 1: Generate focused queries
   const queries = await generateSearchQueries(candidateProfile, userPreferences);
 
-  // Step 2: Search Context.dev for each query in parallel
-  const searchPromises = queries.map(async (q) => {
+  // Step 2: Search Context.dev sequentially to prevent 429 rate limits
+  const allOpportunities = [];
+  for (let i = 0; i < queries.length; i++) {
+    const q = queries[i];
     try {
       const rawResults = await searchContext(q);
-      return rawResults.map(normalizeOpportunity).filter(Boolean);
+      const normalized = rawResults.map(normalizeOpportunity).filter(Boolean);
+      allOpportunities.push(...normalized);
     } catch (e) {
-      return [];
+      console.warn(`Error searching query "${q}":`, e.message);
     }
-  });
 
-  const settledResults = await Promise.allSettled(searchPromises);
-
-  const allOpportunities = settledResults
-    .filter((res) => res.status === 'fulfilled')
-    .flatMap((res) => res.value);
+    if (i < queries.length - 1) {
+      await delay(350); // 350ms gentle pause between search requests
+    }
+  }
 
   // Step 3: Deduplicate by URL
   const uniqueOpportunities = deduplicateOpportunities(allOpportunities);
