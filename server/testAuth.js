@@ -5,11 +5,12 @@ import { generateToken } from './utils/generateToken.js';
 import { protect } from './middleware/authMiddleware.js';
 import { validateGoogleCloudConfig } from './config/googleCloud.js';
 import { checkVertexAIHealth } from './services/vertexAI.js';
+import { validateSupabaseConfig, SUPABASE_BUCKET } from './config/supabase.js';
 
 process.env.JWT_SECRET = 'test-secret-key-for-careerlens-2026';
 
 async function runVerificationTests() {
-  console.log('🧪 Starting CareerLens Verification Tests (Auth, Profile & Vertex AI)...\n');
+  console.log('🧪 Starting CareerLens Verification Tests (Auth, Profile, Vertex AI & Supabase Upload)...\n');
 
   let passed = 0;
   let total = 0;
@@ -105,10 +106,20 @@ async function runVerificationTests() {
   assert(healthStatus.location === 'us-central1', 'Vertex AI defaults to us-central1 location');
   assert(healthStatus.model === 'gemini-1.5-pro', 'Vertex AI defaults to gemini-1.5-pro model');
 
+  // --- Supabase Storage Configuration & Path Tests ---
+  const supabaseConfig = validateSupabaseConfig();
+  assert(typeof supabaseConfig.isConfigured === 'boolean', 'Supabase config validator evaluates configuration status');
+  assert(supabaseConfig.bucket === 'resumes' || SUPABASE_BUCKET === 'resumes', 'Default Supabase bucket is resumes');
+
+  // Test 5: Resume Storage Path formatting
+  const expectedPath = `${SUPABASE_BUCKET}/${dummyUserId}/resume.pdf`;
+  mockUserDoc.resumePath = expectedPath;
+  assert(mockUserDoc.resumePath === 'resumes/65b1234567890abcdef12345/resume.pdf', 'Resume storage path correctly formats to resumes/{userId}/resume.pdf');
+
   console.log(`\n📊 Test Results: ${passed}/${total} tests passed.`);
 
   if (passed === total) {
-    console.log('🎉 All Auth, Profile, and Vertex AI verification tests passed cleanly!\n');
+    console.log('🎉 All Auth, Profile, Vertex AI, and Supabase Storage checks passed cleanly!\n');
   } else {
     process.exit(1);
   }

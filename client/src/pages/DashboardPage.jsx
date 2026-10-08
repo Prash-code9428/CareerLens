@@ -1,6 +1,7 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth.js';
+import ResumeUploader from '../components/ResumeUploader.jsx';
 import {
   Compass,
   LogOut,
@@ -134,7 +135,7 @@ export default function DashboardPage() {
           {/* Upcoming Workflow Pipeline Cards */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Step 1: Resume Upload Placeholder */}
+            {/* Step 1: Resume Upload Section */}
             <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -142,18 +143,17 @@ export default function DashboardPage() {
                     <FileText className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-white">Resume Parsing & Intelligence</h3>
-                    <p className="text-xs text-slate-400">Powered by Google Cloud Vertex AI & Supabase Storage</p>
+                    <h3 className="text-base font-bold text-white">Resume Document Management</h3>
+                    <p className="text-xs text-slate-400">Securely stored in Supabase Storage</p>
                   </div>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                  Phase 2 Next
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  {user?.resumePath ? 'Resume Active' : 'Action Required'}
                 </span>
               </div>
 
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Resume upload with automatic skill extraction, experience modeling, and project evaluation will be enabled in the resume processing phase.
-              </p>
+              {/* Interactive Drag & Drop Resume Uploader */}
+              <ResumeUploader />
             </div>
 
             {/* Step 2: Live Opportunity Research & Matching Placeholder */}
