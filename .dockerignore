@@ -1,0 +1,29 @@
+# Exclude dependencies and build output
+node_modules
+client/node_modules
+client/dist
+server/node_modules
+
+# Exclude environment and secrets
+.env
+.env.*
+*.local
+*.pem
+*.key
+
+# Exclude git repository metadata
+.git
+.gitignore
+
+# Exclude client assets and local test artifacts
+client
+evidence
+*.md
+coverage
+logs
+*.log
+npm-debug.log*
+
+# Exclude OS metadata
+.DS_Store
+Thumbs.db

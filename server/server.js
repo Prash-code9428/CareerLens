@@ -70,9 +70,11 @@ app.get('/', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
+const HOST = '0.0.0.0';
+
 // Start Server
-const server = app.listen(PORT, () => {
-  console.log(`🚀 CareerLens Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+const server = app.listen(PORT, HOST, () => {
+  console.log(`🚀 CareerLens Server running in ${process.env.NODE_ENV || 'development'} mode on http://${HOST}:${PORT}`);
 });
 
 // Graceful Shutdown
