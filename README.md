@@ -27,6 +27,30 @@ CareerLens/
 └── README.md
 ```
 
+## Google Cloud Vertex AI Setup
+
+CareerLens uses the official `@google-cloud/vertexai` SDK authenticated via **Application Default Credentials (ADC)**. No API keys or downloaded service-account JSON files are needed.
+
+### Local Development Setup
+1. Install the [Google Cloud CLI](https://cloud.google.com/sdk/docs/install).
+2. Authenticate your local development environment:
+   ```bash
+   gcloud auth login
+   gcloud auth application-default login
+   ```
+3. Set your active Google Cloud project:
+   ```bash
+   gcloud config set project YOUR_GOOGLE_CLOUD_PROJECT_ID
+   ```
+4. Enable the Vertex AI API:
+   ```bash
+   gcloud services enable aiplatform.googleapis.com
+   ```
+5. Set `GOOGLE_CLOUD_PROJECT_ID=YOUR_GOOGLE_CLOUD_PROJECT_ID` in `server/.env`.
+
+### Production (Google Cloud Run)
+In Cloud Run, the backend automatically inherits permissions from its attached **Service Identity / Service Account** (`roles/aiplatform.user`), eliminating the need for credential files.
+
 ## Getting Started
 
 ### Prerequisites

@@ -3,11 +3,13 @@ import bcrypt from 'bcryptjs';
 import User from './models/User.js';
 import { generateToken } from './utils/generateToken.js';
 import { protect } from './middleware/authMiddleware.js';
+import { validateGoogleCloudConfig } from './config/googleCloud.js';
+import { checkVertexAIHealth, getVertexAIClient } from './services/vertexAI.js';
 
 process.env.JWT_SECRET = 'test-secret-key-for-careerlens-2026';
 
-async function runAuthTests() {
-  console.log('🧪 Starting CareerLens Auth Unit & Logic Verification Tests...\n');
+async function runVerificationTests() {
+  console.log('🧪 Starting CareerLens Verification Tests...\n');
 
   let passed = 0;
   let total = 0;
@@ -22,6 +24,7 @@ async function runAuthTests() {
     }
   }
 
+  // --- Auth Tests ---
   // Test 1: Password hashing via bcryptjs
   const plainPassword = 'SuperSecretPassword123!';
   const salt = await bcrypt.genSalt(10);
@@ -58,7 +61,6 @@ async function runAuthTests() {
   assert(safeObj.__v === undefined, 'Safe object strips version key __v');
 
   // Test 4: Auth Protect Middleware with Mock Request
-  let middlewareNextCalled = false;
   let middlewareStatus = null;
   let middlewareJson = null;
 
@@ -74,9 +76,7 @@ async function runAuthTests() {
   };
 
   // 4a. Missing Authorization header
-  await protect({ headers: {} }, mockRes, () => {
-    middlewareNextCalled = true;
-  });
+  await protect({ headers: {} }, mockRes, () => {});
   assert(middlewareStatus === 401 && middlewareJson?.success === false, 'Protect rejects missing Authorization header with 401');
 
   // 4b. Invalid / malformed token
@@ -85,16 +85,39 @@ async function runAuthTests() {
   await protect({ headers: { authorization: 'Bearer invalid.token.value' } }, mockRes, () => {});
   assert(middlewareStatus === 401, 'Protect rejects malformed JWT token with 401');
 
+  // --- Google Cloud Vertex AI Configuration & Abstraction Tests ---
+  // Test 5: Vertex AI Configuration Validator
+  const configStatus = validateGoogleCloudConfig();
+  assert(typeof configStatus.isConfigured === 'boolean', 'Vertex AI config validator returns boolean configuration state');
+  assert(Array.isArray(configStatus.missing), 'Vertex AI validator tracks missing environment variables');
+
+  // Test 6: Vertex AI Health Check
+  const healthStatus = checkVertexAIHealth();
+  assert(healthStatus.location === 'us-central1', 'Vertex AI defaults to us-central1 location');
+  assert(healthStatus.model === 'gemini-1.5-pro', 'Vertex AI defaults to gemini-1.5-pro model');
+
+  // Test 7: Error handling on missing project configuration
+  if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
+    let clientErrorThrown = false;
+    try {
+      getVertexAIClient();
+    } catch (err) {
+      clientErrorThrown = true;
+      assert(err.message.includes('GOOGLE_CLOUD_PROJECT_ID'), 'Vertex AI client fails gracefully with clear error when project is missing');
+    }
+    assert(clientErrorThrown, 'Vertex AI client enforces presence of project configuration before initialization');
+  }
+
   console.log(`\n📊 Test Results: ${passed}/${total} tests passed.`);
 
   if (passed === total) {
-    console.log('🎉 All Auth unit and security checks passed cleanly!\n');
+    console.log('🎉 All Auth and Google Cloud Vertex AI unit checks passed cleanly!\n');
   } else {
     process.exit(1);
   }
 }
 
-runAuthTests().catch((err) => {
+runVerificationTests().catch((err) => {
   console.error('Test Suite Error:', err);
   process.exit(1);
 });
