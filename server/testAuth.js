@@ -13,6 +13,12 @@ import {
   normalizeOpportunity,
   deduplicateOpportunities
 } from './services/contextSearch.js';
+import {
+  OPPORTUNITY_MATCH_SCHEMA,
+  validateAndNormalizeMatch,
+  evaluateMatchHeuristic,
+  rankAndMatchOpportunities
+} from './services/opportunityMatcher.js';
 
 process.env.JWT_SECRET = 'test-secret-key-for-careerlens-2026';
 
@@ -271,10 +277,76 @@ startxref
   assert(deduplicated.length === 2, 'deduplicateOpportunities accurately deduplicates normalized URLs');
   assert(deduplicated[0].title === 'Job A', 'deduplicateOpportunities preserves first occurrence');
 
+  // --- AI-Powered Opportunity Matching & Ranking Tests ---
+  assert(OPPORTUNITY_MATCH_SCHEMA.type === 'OBJECT', 'OPPORTUNITY_MATCH_SCHEMA defines structured object schema');
+  assert(OPPORTUNITY_MATCH_SCHEMA.required.includes('matchScore'), 'Schema requires matchScore');
+  assert(OPPORTUNITY_MATCH_SCHEMA.required.includes('recommendation'), 'Schema requires recommendation');
+
+  // Test validateAndNormalizeMatch
+  const rawMatchSample = {
+    matchScore: 92,
+    matchingSkills: ['React', 'Node.js', 'MongoDB'],
+    missingSkills: ['GraphQL'],
+    reason: 'Candidate matches modern full-stack development requirements.',
+    recommendation: 'Strong Match'
+  };
+
+  const normalizedMatch = validateAndNormalizeMatch(rawMatchSample);
+  assert(normalizedMatch.matchScore === 92, 'validateAndNormalizeMatch retains matchScore');
+  assert(normalizedMatch.recommendation === 'Strong Match', 'validateAndNormalizeMatch validates Strong Match');
+  assert(normalizedMatch.matchingSkills.length === 3, 'validateAndNormalizeMatch formats matchingSkills');
+  assert(normalizedMatch.missingSkills[0] === 'GraphQL', 'validateAndNormalizeMatch preserves missingSkills');
+
+  // Test Out-of-bounds matchScore and invalid recommendation recovery
+  const outOfBoundsMatch = validateAndNormalizeMatch({
+    matchScore: 150,
+    recommendation: 'Super Great Match'
+  });
+  assert(outOfBoundsMatch.matchScore === 100, 'validateAndNormalizeMatch clamps matchScore to 100');
+  assert(outOfBoundsMatch.recommendation === 'Strong Match', 'validateAndNormalizeMatch corrects recommendation based on score');
+
+  const lowMatch = validateAndNormalizeMatch({
+    matchScore: 25,
+    recommendation: 'Invalid'
+  });
+  assert(lowMatch.recommendation === 'Low Match', 'validateAndNormalizeMatch maps score < 50 to Low Match');
+
+  // Test Heuristic Matcher
+  const testCandidate = {
+    skills: ['React', 'Node.js', 'Express', 'MongoDB'],
+    preferredRoles: ['Full Stack Developer'],
+    location: 'Bangalore'
+  };
+
+  const highMatchOpp = {
+    title: 'Full Stack Developer Intern',
+    company: 'TechCorp',
+    location: 'Bangalore',
+    description: 'Looking for a React, Node.js and MongoDB intern in Bangalore.'
+  };
+
+  const evaluatedHigh = evaluateMatchHeuristic(testCandidate, highMatchOpp);
+  assert(evaluatedHigh.matchScore >= 80, 'evaluateMatchHeuristic scores high skill overlap accurately');
+  assert(evaluatedHigh.recommendation === 'Strong Match' || evaluatedHigh.recommendation === 'Good Match', 'High match scores get Strong/Good Match recommendation');
+  assert(evaluatedHigh.matchingSkills.includes('React'), 'Identifies React in matching skills');
+
+  // Test Opportunity Ranking (sorting by matchScore descending)
+  const oppListToRank = [
+    { title: 'Rust Systems Engineer', description: 'C++ and Rust low level kernel development' },
+    { title: 'Full Stack Developer', description: 'React, Node.js, Express, MongoDB web apps' },
+    { title: 'Python Data Scientist', description: 'Pandas, PyTorch machine learning' }
+  ];
+
+  const rankedList = await rankAndMatchOpportunities(testCandidate, oppListToRank);
+  assert(rankedList.length === 3, 'rankAndMatchOpportunities returns all evaluated opportunities');
+  assert(rankedList[0].title === 'Full Stack Developer', 'Opportunities are sorted by matchScore in descending order');
+  assert(rankedList[0].matchScore >= rankedList[1].matchScore, 'Highest score is ranked first');
+  assert(rankedList[1].matchScore >= rankedList[2].matchScore, 'Subsequent scores are monotonically non-increasing');
+
   console.log(`\n📊 Test Results: ${passed}/${total} tests passed.`);
 
   if (passed === total) {
-    console.log('🎉 All Auth, Profile, Vertex AI, Supabase Storage, Parser & Context.dev Opportunity Discovery checks passed cleanly!\n');
+    console.log('🎉 All Auth, Profile, Vertex AI, Supabase Storage, Parser & Opportunity Matcher checks passed cleanly!\n');
   } else {
     process.exit(1);
   }

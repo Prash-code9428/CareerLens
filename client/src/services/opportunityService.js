@@ -7,6 +7,14 @@ export const opportunityService = {
   async searchOpportunities(payload = {}) {
     const response = await api.post('/opportunities/search', payload);
     return response.data;
+  },
+
+  /**
+   * Match & rank opportunities using Google Cloud Vertex AI
+   */
+  async matchOpportunities(payload = {}) {
+    const response = await api.post('/opportunities/match', payload);
+    return response.data;
   }
 };
 
