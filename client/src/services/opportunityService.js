@@ -7,7 +7,7 @@ export const opportunityService = {
   async searchOpportunities(payload = {}) {
     const isEvent = payload && (payload.nativeEvent || payload.target || payload._reactName || typeof payload.preventDefault === 'function');
     const safePayload = (payload && typeof payload === 'object' && !isEvent) ? payload : {};
-    const response = await api.post('/opportunities/search', safePayload);
+    const response = await api.post('/opportunities/search', safePayload, { timeout: 90000 });
     return response.data;
   },
 
@@ -15,7 +15,7 @@ export const opportunityService = {
    * Match & rank opportunities using Google Cloud Vertex AI
    */
   async matchOpportunities(payload = {}) {
-    const response = await api.post('/opportunities/match', payload);
+    const response = await api.post('/opportunities/match', payload, { timeout: 90000 });
     return response.data;
   }
 };
