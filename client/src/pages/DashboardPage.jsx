@@ -74,7 +74,14 @@ export default function DashboardPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link
+              to="/opportunities"
+              className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 transition-colors"
+            >
+              Opportunities
+            </Link>
+
             <Link
               to="/profile"
               className="text-xs font-semibold text-slate-300 hover:text-emerald-400 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 transition-colors"

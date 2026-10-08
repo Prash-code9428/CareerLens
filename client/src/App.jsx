@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import OpportunitiesPage from './pages/OpportunitiesPage.jsx';
 
 export default function App() {
   return (
@@ -29,6 +30,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/opportunities"
+            element={
+              <ProtectedRoute>
+                <OpportunitiesPage />
               </ProtectedRoute>
             }
           />

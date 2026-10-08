@@ -68,6 +68,13 @@ export default function Navbar() {
             {isAuthenticated ? (
               <>
                 <Link
+                  to="/opportunities"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                >
+                  <Compass className="w-4 h-4 text-emerald-400" />
+                  <span>Opportunities</span>
+                </Link>
+                <Link
                   to="/dashboard"
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold bg-slate-900 border border-slate-800 text-slate-200 hover:text-emerald-400 hover:border-emerald-500/30 transition-colors"
                 >
