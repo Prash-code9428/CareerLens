@@ -19,6 +19,7 @@ import {
   evaluateMatchHeuristic,
   rankAndMatchOpportunities
 } from './services/opportunityMatcher.js';
+import { validateEnvironment } from './config/envValidator.js';
 
 process.env.JWT_SECRET = 'test-secret-key-for-careerlens-2026';
 
@@ -342,6 +343,13 @@ startxref
   assert(rankedList[0].title === 'Full Stack Developer', 'Opportunities are sorted by matchScore in descending order');
   assert(rankedList[0].matchScore >= rankedList[1].matchScore, 'Highest score is ranked first');
   assert(rankedList[1].matchScore >= rankedList[2].matchScore, 'Subsequent scores are monotonically non-increasing');
+
+  // --- Security & Configuration Audit Tests ---
+  const envReport = validateEnvironment();
+  assert(typeof envReport === 'object', 'validateEnvironment returns structured audit report');
+  assert(Array.isArray(envReport.missing.core), 'Environment report tracks missing core variables');
+  assert(JSON.stringify(envReport).includes('password') === false, 'Environment report strictly avoids secret values');
+  assert(JSON.stringify(envReport).includes('secret') === false, 'Environment report contains no secret keys');
 
   console.log(`\n📊 Test Results: ${passed}/${total} tests passed.`);
 
