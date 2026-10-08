@@ -79,10 +79,18 @@ export default function DashboardPage() {
           
           {/* Candidate Profile Summary */}
           <div className="lg:col-span-1 rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-5">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <User className="w-4 h-4 text-emerald-400" />
-              Candidate Profile
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <User className="w-4 h-4 text-emerald-400" />
+                Candidate Profile
+              </h2>
+              <Link
+                to="/profile"
+                className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                Edit Profile
+              </Link>
+            </div>
 
             <div className="space-y-3.5 text-sm">
               <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">

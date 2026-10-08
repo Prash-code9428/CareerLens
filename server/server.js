@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB, disconnectDB } from './config/db.js';
 import healthRoutes from './routes/healthRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // Load environment variables
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 // API Routes
 app.use('/api', healthRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Root fallback route
 app.get('/', (req, res) => {

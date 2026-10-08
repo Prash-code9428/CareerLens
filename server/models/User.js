@@ -26,10 +26,10 @@ const userSchema = new mongoose.Schema(
       select: false
     },
     education: {
-      university: { type: String, default: '' },
-      degree: { type: String, default: '' },
-      major: { type: String, default: '' },
-      graduationYear: { type: String, default: '' }
+      university: { type: String, default: '', trim: true },
+      degree: { type: String, default: '', trim: true },
+      major: { type: String, default: '', trim: true },
+      graduationYear: { type: String, default: '', trim: true }
     },
     location: {
       type: String,
@@ -42,13 +42,19 @@ const userSchema = new mongoose.Schema(
     },
     workMode: {
       type: String,
-      enum: ['remote', 'hybrid', 'onsite', 'any'],
-      default: 'any'
+      enum: [
+        'Remote', 'Hybrid', 'On-site', 'Any',
+        'remote', 'hybrid', 'onsite', 'on-site', 'any'
+      ],
+      default: 'Any'
     },
     experienceLevel: {
       type: String,
-      enum: ['internship', 'entry-level', 'junior', 'all'],
-      default: 'internship'
+      enum: [
+        'Student', 'Fresher', '0–1 years', '0-1 years', '1–3 years', '1-3 years',
+        'internship', 'entry-level', 'junior', 'all'
+      ],
+      default: 'Student'
     },
     resumePath: {
       type: String,

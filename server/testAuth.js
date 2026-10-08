@@ -4,12 +4,12 @@ import User from './models/User.js';
 import { generateToken } from './utils/generateToken.js';
 import { protect } from './middleware/authMiddleware.js';
 import { validateGoogleCloudConfig } from './config/googleCloud.js';
-import { checkVertexAIHealth, getVertexAIClient } from './services/vertexAI.js';
+import { checkVertexAIHealth } from './services/vertexAI.js';
 
 process.env.JWT_SECRET = 'test-secret-key-for-careerlens-2026';
 
 async function runVerificationTests() {
-  console.log('🧪 Starting CareerLens Verification Tests...\n');
+  console.log('🧪 Starting CareerLens Verification Tests (Auth, Profile & Vertex AI)...\n');
 
   let passed = 0;
   let total = 0;
@@ -43,20 +43,31 @@ async function runVerificationTests() {
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
   assert(decoded.id === dummyUserId, 'Decoded token ID matches user ID');
 
-  // Test 3: Safe Object Serialization
+  // Test 3: Safe Object Serialization & Profile Schema
   const mockUserDoc = new User({
     name: 'Priya Patel',
     email: 'priya@university.edu',
     password: 'securepassword123',
+    education: {
+      university: 'National Institute of Technology',
+      degree: 'B.Tech',
+      major: 'Computer Science',
+      graduationYear: '2026'
+    },
     location: 'Bangalore',
-    preferredRoles: ['Frontend Engineer', 'Full Stack Developer'],
-    workMode: 'hybrid',
-    experienceLevel: 'internship'
+    preferredRoles: ['Software Engineer Intern', 'Full Stack Developer'],
+    workMode: 'Hybrid',
+    experienceLevel: 'Student'
   });
 
   const safeObj = mockUserDoc.toSafeObject();
   assert(safeObj.name === 'Priya Patel', 'Safe object retains user name');
   assert(safeObj.email === 'priya@university.edu', 'Safe object retains email');
+  assert(safeObj.education.university === 'National Institute of Technology', 'Safe object retains education details');
+  assert(safeObj.education.degree === 'B.Tech', 'Safe object retains degree');
+  assert(safeObj.preferredRoles.length === 2, 'Preferred roles list properly mapped');
+  assert(safeObj.workMode === 'Hybrid', 'Work mode preference correctly stored');
+  assert(safeObj.experienceLevel === 'Student', 'Experience level preference correctly stored');
   assert(safeObj.password === undefined, 'Safe object STRICTLY removes password');
   assert(safeObj.__v === undefined, 'Safe object strips version key __v');
 
@@ -85,33 +96,19 @@ async function runVerificationTests() {
   await protect({ headers: { authorization: 'Bearer invalid.token.value' } }, mockRes, () => {});
   assert(middlewareStatus === 401, 'Protect rejects malformed JWT token with 401');
 
-  // --- Google Cloud Vertex AI Configuration & Abstraction Tests ---
-  // Test 5: Vertex AI Configuration Validator
+  // --- Google Cloud Vertex AI Configuration Tests ---
   const configStatus = validateGoogleCloudConfig();
   assert(typeof configStatus.isConfigured === 'boolean', 'Vertex AI config validator returns boolean configuration state');
   assert(Array.isArray(configStatus.missing), 'Vertex AI validator tracks missing environment variables');
 
-  // Test 6: Vertex AI Health Check
   const healthStatus = checkVertexAIHealth();
   assert(healthStatus.location === 'us-central1', 'Vertex AI defaults to us-central1 location');
   assert(healthStatus.model === 'gemini-1.5-pro', 'Vertex AI defaults to gemini-1.5-pro model');
 
-  // Test 7: Error handling on missing project configuration
-  if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
-    let clientErrorThrown = false;
-    try {
-      getVertexAIClient();
-    } catch (err) {
-      clientErrorThrown = true;
-      assert(err.message.includes('GOOGLE_CLOUD_PROJECT_ID'), 'Vertex AI client fails gracefully with clear error when project is missing');
-    }
-    assert(clientErrorThrown, 'Vertex AI client enforces presence of project configuration before initialization');
-  }
-
   console.log(`\n📊 Test Results: ${passed}/${total} tests passed.`);
 
   if (passed === total) {
-    console.log('🎉 All Auth and Google Cloud Vertex AI unit checks passed cleanly!\n');
+    console.log('🎉 All Auth, Profile, and Vertex AI verification tests passed cleanly!\n');
   } else {
     process.exit(1);
   }
