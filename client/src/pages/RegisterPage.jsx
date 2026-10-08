@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Mail, UserPlus } from 'lucide-react';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import Input from '../components/Input.jsx';
 import PasswordInput from '../components/PasswordInput.jsx';
 import Button from '../components/Button.jsx';
 import FormError from '../components/FormError.jsx';
+import useAuth from '../hooks/useAuth.js';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -17,6 +19,16 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const { register, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const validate = () => {
     const newErrors = {};
@@ -80,16 +92,19 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // Backend integration hook placeholder:
-      // const response = await axios.post('/api/auth/register', {
-      //   name: formData.name.trim(),
-      //   email: formData.email.trim(),
-      //   password: formData.password
-      // });
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setFormError('Backend authentication endpoint will be connected in the next phase.');
+      await register({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        password: formData.password
+      });
+
+      navigate('/dashboard', { replace: true });
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Registration failed. Please try again.');
+      const message =
+        err.response?.data?.message ||
+        (err.code === 'ERR_NETWORK' ? 'Unable to reach backend server. Please ensure the API is running.' : err.message) ||
+        'Registration failed. Please try again.';
+      setFormError(message);
     } finally {
       setLoading(false);
     }

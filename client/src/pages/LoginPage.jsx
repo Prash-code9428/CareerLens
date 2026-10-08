@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, LogIn } from 'lucide-react';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import Input from '../components/Input.jsx';
 import PasswordInput from '../components/PasswordInput.jsx';
 import Button from '../components/Button.jsx';
 import FormError from '../components/FormError.jsx';
+import useAuth from '../hooks/useAuth.js';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -15,6 +17,18 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const validate = () => {
     const newErrors = {};
@@ -41,7 +55,6 @@ export default function LoginPage() {
       [name]: value
     }));
 
-    // Clear individual field error on change
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -64,16 +77,19 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Backend integration hook placeholder:
-      // const response = await axios.post('/api/auth/login', {
-      //   email: formData.email.trim(),
-      //   password: formData.password
-      // });
-      // For now, simulate network response delay for frontend state verification
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setFormError('Backend authentication endpoint will be connected in the next phase.');
+      await login({
+        email: formData.email.trim(),
+        password: formData.password
+      });
+
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Login failed. Please try again.');
+      const message =
+        err.response?.data?.message ||
+        (err.code === 'ERR_NETWORK' ? 'Unable to reach backend server. Please ensure the API is running.' : err.message) ||
+        'Login failed. Please check your credentials.';
+      setFormError(message);
     } finally {
       setLoading(false);
     }
