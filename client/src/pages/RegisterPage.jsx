@@ -1,49 +1,188 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Compass, ArrowLeft, UserPlus } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Mail, UserPlus } from 'lucide-react';
+import AuthLayout from '../layouts/AuthLayout.jsx';
+import Input from '../components/Input.jsx';
+import PasswordInput from '../components/PasswordInput.jsx';
+import Button from '../components/Button.jsx';
+import FormError from '../components/FormError.jsx';
 
 export default function RegisterPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const validate = () => {
+    const newErrors = {};
+    const nameTrimmed = formData.name.trim();
+    const emailTrimmed = formData.email.trim();
+
+    if (!nameTrimmed) {
+      newErrors.name = 'Full name is required';
+    } else if (nameTrimmed.length < 2) {
+      newErrors.name = 'Full name must be at least 2 characters';
+    }
+
+    if (!emailTrimmed) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Confirm password is required';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+    if (formError) {
+      setFormError('');
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormError('');
+
+    if (!validate()) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Backend integration hook placeholder:
+      // const response = await axios.post('/api/auth/register', {
+      //   name: formData.name.trim(),
+      //   email: formData.email.trim(),
+      //   password: formData.password
+      // });
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setFormError('Backend authentication endpoint will be connected in the next phase.');
+    } catch (err) {
+      setFormError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isFormIncomplete =
+    !formData.name.trim() ||
+    !formData.email.trim() ||
+    !formData.password ||
+    !formData.confirmPassword;
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center items-center px-4 py-12">
-      <div className="w-full max-w-md space-y-8 bg-slate-900/80 border border-slate-800 p-8 rounded-2xl shadow-2xl backdrop-blur">
-        
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <Link to="/" className="inline-flex items-center gap-2 text-emerald-400 font-bold text-xl mb-2">
-            <Compass className="w-6 h-6" />
-            CareerLens
-          </Link>
-          <h1 className="text-2xl font-bold tracking-tight text-white">
-            Create your account
-          </h1>
-          <p className="text-sm text-slate-400">
-            Start matching your profile with verified opportunities
-          </p>
-        </div>
+    <AuthLayout
+      title="Create your account"
+      subtitle="Join CareerLens to get tailored, AI-verified placement matches."
+      footerLinkText="Already have an account?"
+      footerLinkTo="/login"
+      footerLinkAction="Sign in"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        {formError && <FormError message={formError} />}
 
-        {/* Placeholder Notice */}
-        <div className="rounded-xl bg-slate-950/60 border border-slate-800 p-4 text-xs text-slate-400 space-y-2">
-          <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-            <UserPlus className="w-4 h-4" />
-            <span>Registration Flow</span>
-          </div>
-          <p>
-            Student registration and onboarding are scheduled for the next implementation phase.
-          </p>
-        </div>
+        <Input
+          id="register-name"
+          name="name"
+          type="text"
+          label="Full Name"
+          placeholder="Alex Sharma"
+          value={formData.name}
+          onChange={handleChange}
+          error={errors.name}
+          required
+          autoComplete="name"
+          disabled={loading}
+          icon={User}
+        />
 
-        {/* Back link */}
-        <div className="pt-2 text-center">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+        <Input
+          id="register-email"
+          name="email"
+          type="email"
+          label="Email Address"
+          placeholder="alex@university.edu"
+          value={formData.email}
+          onChange={handleChange}
+          error={errors.email}
+          required
+          autoComplete="email"
+          disabled={loading}
+          icon={Mail}
+        />
+
+        <PasswordInput
+          id="register-password"
+          name="password"
+          label="Password"
+          placeholder="At least 6 characters"
+          value={formData.password}
+          onChange={handleChange}
+          error={errors.password}
+          helperText={!errors.password ? 'Must be at least 6 characters' : undefined}
+          required
+          autoComplete="new-password"
+          disabled={loading}
+        />
+
+        <PasswordInput
+          id="register-confirm-password"
+          name="confirmPassword"
+          label="Confirm Password"
+          placeholder="Re-enter password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          error={errors.confirmPassword}
+          required
+          autoComplete="new-password"
+          disabled={loading}
+        />
+
+        <div className="pt-2">
+          <Button
+            type="submit"
+            variant="primary"
+            size="md"
+            fullWidth
+            loading={loading}
+            disabled={isFormIncomplete}
+            icon={UserPlus}
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
+            Create Account
+          </Button>
         </div>
-
-      </div>
-    </div>
+      </form>
+    </AuthLayout>
   );
 }
