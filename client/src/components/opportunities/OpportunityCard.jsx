@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   Building2,
   MapPin,
@@ -30,6 +31,8 @@ export default function OpportunityCard({ opportunity }) {
     reason
   } = opportunity;
 
+  const oppId = btoa(encodeURIComponent(url || '')).replace(/[^a-zA-Z0-9]/g, '').slice(0, 24);
+
   // Derive job type or work mode if explicitly mentioned in title without fabricating
   const lowerTitle = (title || '').toLowerCase();
   let displayJobType = jobType || null;
@@ -56,9 +59,15 @@ export default function OpportunityCard({ opportunity }) {
         {/* Header: Title & Match Score */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div className="space-y-1.5 flex-1">
-            <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug line-clamp-2">
-              {title}
-            </h3>
+            <Link
+              to={`/opportunities/${oppId}`}
+              state={{ opportunity }}
+              className="block group/title"
+            >
+              <h3 className="text-base sm:text-lg font-bold text-white group-hover/title:text-emerald-300 transition-colors leading-snug line-clamp-2">
+                {title}
+              </h3>
+            </Link>
 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-slate-400">
               {company && (
@@ -147,24 +156,34 @@ export default function OpportunityCard({ opportunity }) {
         )}
       </div>
 
-      {/* Footer: Source Domain and Direct External Link */}
+      {/* Footer: Source Domain and Actions */}
       <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs text-slate-400">
           <Globe className="w-3.5 h-3.5 text-slate-500" />
-          <span className="truncate max-w-[160px] sm:max-w-[220px]">
+          <span className="truncate max-w-[120px] sm:max-w-[160px]">
             {source || 'Hiring Portal'}
           </span>
         </div>
 
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-400 text-slate-950 hover:bg-emerald-300 active:bg-emerald-500 transition-colors shadow-sm cursor-pointer group-hover:shadow-emerald-500/10"
-        >
-          <span>View Opportunity</span>
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
+        <div className="flex items-center gap-2">
+          <Link
+            to={`/opportunities/${btoa(encodeURIComponent(url)).replace(/[^a-zA-Z0-9]/g, '').slice(0, 24)}`}
+            state={{ opportunity }}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+          >
+            Details
+          </Link>
+
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-400 text-slate-950 hover:bg-emerald-300 active:bg-emerald-500 transition-colors shadow-sm cursor-pointer group-hover:shadow-emerald-500/10"
+          >
+            <span>Apply Now</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
       </div>
     </div>
   );

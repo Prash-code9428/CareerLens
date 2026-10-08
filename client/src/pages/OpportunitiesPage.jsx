@@ -50,6 +50,11 @@ export default function OpportunitiesPage() {
         setQueries(response.queries || []);
         setOpportunities(response.opportunities || []);
         setHasSearched(true);
+        try {
+          sessionStorage.setItem('careerlens_opportunities', JSON.stringify(response.opportunities || []));
+        } catch (e) {
+          // ignore storage error
+        }
       } else {
         setError(response.message || 'Unable to discover opportunities.');
       }

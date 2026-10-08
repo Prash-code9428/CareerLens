@@ -8,6 +8,7 @@ import RegisterPage from './pages/RegisterPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import OpportunitiesPage from './pages/OpportunitiesPage.jsx';
+import OpportunityDetailsPage from './pages/OpportunityDetailsPage.jsx';
 
 export default function App() {
   return (
@@ -38,6 +39,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <OpportunitiesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/opportunities/:id"
+            element={
+              <ProtectedRoute>
+                <OpportunityDetailsPage />
               </ProtectedRoute>
             }
           />
