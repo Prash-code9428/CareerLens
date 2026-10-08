@@ -64,8 +64,8 @@ export default function OpportunitiesPage() {
     } catch (err) {
       const message =
         err.response?.data?.message ||
-        (err.code === 'ERR_NETWORK' ? 'Unable to reach the backend server.' : err.message) ||
-        'Failed to discover opportunities.';
+        (err.code === 'ERR_NETWORK' ? 'Unable to reach the backend server. Please check your internet connection.' : err.message) ||
+        "We couldn't find opportunities at the moment. Please try again shortly.";
       setError(message);
     } finally {
       setLoading(false);

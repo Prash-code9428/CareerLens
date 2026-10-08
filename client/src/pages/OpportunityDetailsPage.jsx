@@ -3,6 +3,8 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth.js';
 import MatchScore from '../components/opportunities/MatchScore.jsx';
 import SkillBadge from '../components/opportunities/SkillBadge.jsx';
+import PageLoader from '../components/common/PageLoader.jsx';
+import PageError from '../components/common/PageError.jsx';
 import {
   Compass,
   ArrowLeft,
@@ -89,48 +91,17 @@ export default function OpportunityDetailsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400">
-        <Compass className="w-8 h-8 text-emerald-400 animate-spin mb-3" />
-        <p className="text-sm font-medium">Loading opportunity details...</p>
-      </div>
-    );
+    return <PageLoader message="Loading opportunity details..." />;
   }
 
   if (!opportunity) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-        {/* Top Header */}
-        <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-slate-950/80 border-b border-slate-800">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <Link
-              to="/opportunities"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Opportunities</span>
-            </Link>
-          </div>
-        </header>
-
-        <main className="flex-1 max-w-2xl mx-auto px-4 py-16 text-center space-y-4">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500">
-            <FileText className="w-7 h-7" />
-          </div>
-          <h1 className="text-xl font-bold text-white">Opportunity Not Found</h1>
-          <p className="text-xs sm:text-sm text-slate-400">
-            This opportunity might have expired or was opened without a cached session. Return to the discovery dashboard to find active postings.
-          </p>
-          <div className="pt-2">
-            <Link
-              to="/opportunities"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-emerald-400 text-slate-950 hover:bg-emerald-300 transition-colors"
-            >
-              <span>Browse Live Opportunities</span>
-            </Link>
-          </div>
-        </main>
-      </div>
+      <PageError
+        title="Opportunity Not Found"
+        message="This opportunity might have expired or is unavailable. Return to the discovery dashboard to find active postings."
+        backTo="/opportunities"
+        backLabel="Browse Live Opportunities"
+      />
     );
   }
 

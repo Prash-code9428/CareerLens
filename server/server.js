@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB, disconnectDB } from './config/db.js';
+import { validateEnvironment } from './config/envValidator.js';
 import healthRoutes from './routes/healthRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
@@ -9,8 +10,12 @@ import resumeRoutes from './routes/resumeRoutes.js';
 import opportunityRoutes from './routes/opportunityRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
-// Load environment variables
+// Load environment variables (checks current directory and root workspace)
 dotenv.config();
+dotenv.config({ path: '../.env' });
+
+// Audit & validate environment variables
+validateEnvironment();
 
 // Initialize MongoDB connection
 connectDB();

@@ -21,6 +21,9 @@ import profileService from '../services/profileService.js';
 import Input from '../components/Input.jsx';
 import Button from '../components/Button.jsx';
 import FormError from '../components/FormError.jsx';
+import ProfileSkeleton from '../components/common/ProfileSkeleton.jsx';
+import PageError from '../components/common/PageError.jsx';
+import InlineAlert from '../components/common/InlineAlert.jsx';
 
 const WORK_MODES = ['Any', 'Remote', 'Hybrid', 'On-site'];
 const EXPERIENCE_LEVELS = ['Student', 'Fresher', '0–1 years', '1–3 years'];
@@ -58,39 +61,43 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fetchError, setFetchError] = useState('');
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      setFetchError('');
+      const data = await profileService.getProfile();
+      if (data.success && data.user) {
+        const u = data.user;
+        setFormData({
+          name: u.name || '',
+          email: u.email || '',
+          location: u.location || '',
+          education: {
+            university: u.education?.university || '',
+            degree: u.education?.degree || '',
+            major: u.education?.major || '',
+            graduationYear: u.education?.graduationYear || ''
+          },
+          preferredRoles: Array.isArray(u.preferredRoles) ? u.preferredRoles : [],
+          workMode: u.workMode || 'Any',
+          experienceLevel: u.experienceLevel || 'Student'
+        });
+      }
+    } catch (err) {
+      setFetchError(
+        err.response?.data?.message ||
+        (err.code === 'ERR_NETWORK' ? 'Unable to reach the server. Please check your internet connection.' : err.message) ||
+        'Unable to load your profile. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load profile data on mount
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const data = await profileService.getProfile();
-        if (data.success && data.user) {
-          const u = data.user;
-          setFormData({
-            name: u.name || '',
-            email: u.email || '',
-            location: u.location || '',
-            education: {
-              university: u.education?.university || '',
-              degree: u.education?.degree || '',
-              major: u.education?.major || '',
-              graduationYear: u.education?.graduationYear || ''
-            },
-            preferredRoles: Array.isArray(u.preferredRoles) ? u.preferredRoles : [],
-            workMode: u.workMode || 'Any',
-            experienceLevel: u.experienceLevel || 'Student'
-          });
-        }
-      } catch (err) {
-        setErrorMessage(
-          err.response?.data?.message || 'Failed to load profile data from server.'
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProfile();
   }, []);
 
@@ -202,12 +209,15 @@ export default function ProfilePage() {
 
   const completionPercent = computeCompletion();
 
-  if (loading) {
+  if (fetchError) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400">
-        <Compass className="w-8 h-8 text-emerald-400 animate-spin mb-3" />
-        <p className="text-sm font-medium">Loading candidate profile...</p>
-      </div>
+      <PageError
+        title="Unable to load your profile"
+        message={fetchError}
+        onRetry={fetchProfile}
+        backTo="/dashboard"
+        backLabel="Back to Dashboard"
+      />
     );
   }
 
@@ -237,6 +247,10 @@ export default function ProfilePage() {
 
       {/* Main Body */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {loading ? (
+          <ProfileSkeleton />
+        ) : (
+          <>
         
         {/* Page Title & Profile Completion Card */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -601,6 +615,8 @@ export default function ProfilePage() {
           </div>
 
         </form>
+        </>
+        )}
 
       </main>
     </div>

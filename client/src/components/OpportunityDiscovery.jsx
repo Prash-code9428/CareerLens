@@ -40,8 +40,8 @@ export default function OpportunityDiscovery({ candidateProfile, userPreferences
     } catch (err) {
       const message =
         err.response?.data?.message ||
-        (err.code === 'ERR_NETWORK' ? 'Unable to reach backend server.' : err.message) ||
-        'Failed to discover live opportunities.';
+        (err.code === 'ERR_NETWORK' ? 'Unable to reach backend server. Please check your internet connection.' : err.message) ||
+        "We couldn't find opportunities at the moment. Please try again shortly.";
       setError(message);
     } finally {
       setLoading(false);

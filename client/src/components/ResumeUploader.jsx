@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import resumeService from '../services/resumeService.js';
 import useAuth from '../hooks/useAuth.js';
+import InlineAlert from './common/InlineAlert.jsx';
 
 export default function ResumeUploader({ onUploadSuccess }) {
   const { user, setUser } = useAuth();
@@ -86,8 +87,8 @@ export default function ResumeUploader({ onUploadSuccess }) {
     } catch (err) {
       const message =
         err.response?.data?.message ||
-        (err.code === 'ERR_NETWORK' ? 'Backend server unavailable.' : err.message) ||
-        'Failed to upload resume.';
+        (err.code === 'ERR_NETWORK' ? 'Unable to reach backend server. Please check your internet connection.' : err.message) ||
+        'Unable to upload resume. Please try again.';
       setErrorMessage(message);
     } finally {
       setUploading(false);
@@ -255,17 +256,20 @@ export default function ResumeUploader({ onUploadSuccess }) {
 
       {/* Feedback Messages */}
       {statusMessage && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{statusMessage}</span>
-        </div>
+        <InlineAlert
+          type="success"
+          message={statusMessage}
+          onClose={() => setStatusMessage('')}
+        />
       )}
 
       {errorMessage && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-          <span>{errorMessage}</span>
-        </div>
+        <InlineAlert
+          type="error"
+          message={errorMessage}
+          onRetry={selectedFile ? () => uploadFile(selectedFile) : undefined}
+          onClose={() => setErrorMessage('')}
+        />
       )}
     </div>
   );

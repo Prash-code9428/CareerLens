@@ -27,7 +27,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# IDE & Editor
+# OS & IDE
+.DS_Store
+Thumbs.db
+.vscode/settings.json
 .vscode/
 .idea/
 *.suo
@@ -35,10 +38,10 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
-.DS_Store
 
-# Google Cloud credentials
+# Google Cloud credentials & Service Accounts (Must NEVER be stored or committed)
 *credentials*.json
 *service-account*.json
 key.json
 keys.json
+service_account.json

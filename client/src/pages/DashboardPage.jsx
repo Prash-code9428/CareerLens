@@ -32,6 +32,9 @@ import {
   ShieldCheck
 } from 'lucide-react';
 
+import InlineAlert from '../components/common/InlineAlert.jsx';
+import DashboardSkeleton from '../components/common/DashboardSkeleton.jsx';
+
 export default function DashboardPage() {
   const { user, setUser, logout } = useAuth();
   const navigate = useNavigate();
@@ -80,8 +83,8 @@ export default function DashboardPage() {
     } catch (err) {
       const message =
         err.response?.data?.message ||
-        (err.code === 'ERR_NETWORK' ? 'Unable to reach backend server.' : err.message) ||
-        'Failed to analyze resume with Vertex AI.';
+        (err.code === 'ERR_NETWORK' ? 'Unable to reach backend server. Please check your connection.' : err.message) ||
+        "We couldn't analyze your resume right now. Please try again.";
       setAnalysisError(message);
     } finally {
       setAnalyzing(false);
@@ -242,17 +245,20 @@ export default function DashboardPage() {
 
         {/* Global Feedback Banners */}
         {analysisSuccess && (
-          <div className="flex items-center gap-2.5 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-            <span>{analysisSuccess}</span>
-          </div>
+          <InlineAlert
+            type="success"
+            message={analysisSuccess}
+            onClose={() => setAnalysisSuccess('')}
+          />
         )}
 
         {analysisError && (
-          <div className="flex items-center gap-2.5 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm">
-            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
-            <span>{analysisError}</span>
-          </div>
+          <InlineAlert
+            type="error"
+            message={analysisError}
+            onRetry={hasResume ? handleAnalyzeResume : undefined}
+            onClose={() => setAnalysisError('')}
+          />
         )}
 
         {/* 4 Core Metric Command Cards */}
