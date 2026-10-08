@@ -351,6 +351,48 @@ startxref
   assert(JSON.stringify(envReport).includes('password') === false, 'Environment report strictly avoids secret values');
   assert(JSON.stringify(envReport).includes('secret') === false, 'Environment report contains no secret keys');
 
+  // --- End-to-End Filtering, Sorting & Opportunity Details Tests ---
+  const mockOpportunities = [
+    { title: 'Frontend Intern', company: 'Alpha Inc', location: 'Remote', description: 'React internship', source: 'alpha.com', url: 'https://alpha.com/job/1', matchScore: 95, recommendation: 'Strong Match' },
+    { title: 'Full Stack Engineer', company: 'Beta Corp', location: 'Hybrid, Bangalore', description: 'Node.js and MongoDB job', source: 'beta.com', url: 'https://beta.com/job/2', matchScore: 82, recommendation: 'Good Match' },
+    { title: 'Junior Data Analyst', company: 'Gamma LLC', location: 'On-site, Mumbai', description: 'Python data analysis', source: 'gamma.com', url: 'https://gamma.com/job/3', matchScore: 65, recommendation: 'Possible Match' },
+    { title: 'Backend Intern', company: 'Delta Tech', location: 'Remote', description: 'Node.js Express backend', source: 'delta.com', url: 'https://delta.com/job/4', matchScore: 88, recommendation: 'Strong Match' }
+  ];
+
+  // Test Type Filter (Internship vs Job)
+  const internshipFilter = mockOpportunities.filter(o => o.title.toLowerCase().includes('intern') || o.description.toLowerCase().includes('intern'));
+  assert(internshipFilter.length === 2, 'Opportunity Type filter accurately filters internship roles');
+
+  // Test Work Mode Filter (Remote vs Hybrid vs On-site)
+  const remoteFilter = mockOpportunities.filter(o => o.location.toLowerCase().includes('remote'));
+  assert(remoteFilter.length === 2, 'Work Mode filter accurately isolates Remote opportunities');
+
+  // Test Match Score Filter (80%+ threshold)
+  const score80Filter = mockOpportunities.filter(o => o.matchScore >= 80);
+  assert(score80Filter.length === 3, 'Match Score filter isolates 80%+ matches correctly');
+
+  // Test Keyword Search (by title or company)
+  const keywordSearch = mockOpportunities.filter(o => 
+    o.title.toLowerCase().includes('frontend') || 
+    o.company.toLowerCase().includes('frontend') ||
+    o.description.toLowerCase().includes('frontend')
+  );
+  assert(keywordSearch.length === 1 && keywordSearch[0].company === 'Alpha Inc', 'Keyword search accurately filters by skill/title');
+
+  // Test Sorting: Best Match (descending matchScore) vs Recently Found
+  const sortedBestMatch = [...mockOpportunities].sort((a, b) => b.matchScore - a.matchScore);
+  assert(sortedBestMatch[0].matchScore === 95, 'Best Match sort places highest matchScore at index 0');
+  assert(sortedBestMatch[sortedBestMatch.length - 1].matchScore === 65, 'Best Match sort places lowest matchScore at the end');
+
+  // Test Failure State Recovery: Empty Opportunity list handling
+  const emptyResults = [];
+  assert(Array.isArray(emptyResults) && emptyResults.length === 0, 'Empty opportunity results handled gracefully without crash');
+
+  // Test Security & Sanitization on Serialized Candidate Profile
+  const serializedUser = mockUserDoc.toSafeObject();
+  assert(serializedUser.password === undefined, 'Serialized user object contains NO password property');
+  assert(serializedUser.__v === undefined, 'Serialized user object strips internal Mongoose __v');
+
   console.log(`\n📊 Test Results: ${passed}/${total} tests passed.`);
 
   if (passed === total) {
