@@ -2,7 +2,7 @@
 # CareerLens Backend Production Dockerfile for Google Cloud Run
 # ==============================================================================
 # Base image: Official Node.js 20 LTS on Alpine Linux for a minimal attack surface
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Set environment to production
 ENV NODE_ENV=production

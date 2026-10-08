@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { connectDB, disconnectDB } from './config/db.js';
+import { connectDB, disconnectDB, ensureDBConnection } from './config/db.js';
 import { validateEnvironment } from './config/envValidator.js';
 import healthRoutes from './routes/healthRoutes.js';
 import authRoutes from './routes/authRoutes.js';
@@ -50,6 +50,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(ensureDBConnection);
 
 // API Routes
 app.use('/api', healthRoutes);

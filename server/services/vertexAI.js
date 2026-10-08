@@ -37,7 +37,7 @@ export const getVertexAIClient = () => {
  */
 export const getGenerativeModel = (options = {}) => {
   const vertexAI = getVertexAIClient();
-  const modelName = options.model || googleCloudConfig.model || 'gemini-1.5-pro';
+  const modelName = options.model || googleCloudConfig.model || 'gemini-1.5-flash';
 
   const {
     model: _unusedModel,
@@ -65,8 +65,7 @@ export const getGenerativeModel = (options = {}) => {
 };
 
 /**
- * Clean abstraction function for executing future structured model prompts
- * (Handles error formatting, token sanitization, and structured JSON parsing)
+ * Executes structured model prompts with Gemini API Key (Direct API) or Vertex AI (ADC)
  * 
  * @param {Object} params
  * @param {string} params.prompt - Prompt instruction
@@ -85,9 +84,71 @@ export const generateStructuredContent = async ({
     throw new Error('Prompt is required for Vertex AI generation');
   }
 
+  const activeModel = model || googleCloudConfig.model || 'gemini-1.5-flash';
+  const apiKey = googleCloudConfig.apiKey;
+
+  // 1. Direct Google Gemini Developer API (if API Key provided)
+  if (apiKey) {
+    const candidateModels = [
+      activeModel,
+      'gemini-3.8-flash',
+      'gemini-3.5-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-flash-latest'
+    ].filter((v, i, a) => a.indexOf(v) === i);
+
+    let lastError = null;
+    for (const m of candidateModels) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
+        const payload = {
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.2,
+            responseMimeType: 'application/json',
+            ...(responseSchema && { responseSchema })
+          },
+          ...(systemInstruction && {
+            systemInstruction: { parts: [{ text: systemInstruction }] }
+          })
+        };
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errBody = await res.text();
+          throw new Error(`[GeminiAPI.Error]: got status: ${res.status} - ${errBody}`);
+        }
+
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!text) {
+          throw new Error('Empty text content received from Gemini API');
+        }
+
+        try {
+          return JSON.parse(text);
+        } catch (parseError) {
+          console.warn('Gemini API response was not valid JSON, returning raw text payload.');
+          return { raw: text };
+        }
+      } catch (err) {
+        lastError = err;
+        console.warn(`Gemini model ${m} attempt: ${err.message.substring(0, 120)}`);
+      }
+    }
+    console.error('Gemini API Service Error after all model attempts:', lastError?.message);
+    throw new Error(`AI Analysis Service Error: ${lastError?.message}`);
+  }
+
+  // 2. Vertex AI (ADC / Cloud Run Service Account)
   try {
     const generativeModel = getGenerativeModel({
-      model,
+      model: activeModel,
       systemInstruction,
       responseSchema,
       responseMimeType: 'application/json'
@@ -114,19 +175,19 @@ export const generateStructuredContent = async ({
       return { raw: text };
     }
   } catch (error) {
-    // Sanitize error reporting: never log raw resume content or authorization credentials
     console.error('Vertex AI Service Error:', error.message);
     throw new Error(`AI Analysis Service Error: ${error.message}`);
   }
 };
 
 /**
- * Non-invasive health/configuration check for Vertex AI
+ * Non-invasive health/configuration check for Vertex AI & Gemini
  */
 export const checkVertexAIHealth = () => {
   const status = validateGoogleCloudConfig();
   return {
-    ready: status.isConfigured,
+    ready: status.isConfigured || Boolean(googleCloudConfig.apiKey),
+    hasApiKey: Boolean(googleCloudConfig.apiKey),
     projectId: status.config.projectId,
     location: status.config.location,
     model: status.config.model,

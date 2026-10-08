@@ -14,6 +14,9 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
  * - Cloud Run production: Attached Service Account / Workload Identity
  */
 export const googleCloudConfig = {
+  get apiKey() {
+    return process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+  },
   get projectId() {
     return process.env.GOOGLE_CLOUD_PROJECT_ID || '';
   },
@@ -21,7 +24,7 @@ export const googleCloudConfig = {
     return process.env.VERTEX_AI_LOCATION || 'us-central1';
   },
   get model() {
-    return process.env.VERTEX_AI_MODEL || 'gemini-1.5-pro';
+    return process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash';
   }
 };
 

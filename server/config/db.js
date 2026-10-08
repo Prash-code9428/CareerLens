@@ -11,18 +11,35 @@ export const connectDB = async () => {
     return null;
   }
 
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
   try {
-    const conn = await mongoose.connect(uri);
+    const conn = await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 8000,
+      maxPoolSize: 10
+    });
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    // In production we may choose to exit, but in dev/testing we log clearly
-    if (process.env.NODE_ENV === 'production') {
-      process.exit(1);
-    }
     return null;
   }
+};
+
+/**
+ * Express middleware to ensure MongoDB connection is active on incoming requests
+ */
+export const ensureDBConnection = async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1 && process.env.MONGODB_URI) {
+    try {
+      await connectDB();
+    } catch (e) {
+      console.warn('DB reconnect attempt in request middleware failed:', e.message);
+    }
+  }
+  next();
 };
 
 /**

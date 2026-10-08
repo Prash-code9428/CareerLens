@@ -129,20 +129,24 @@ export const evaluateMatchHeuristic = (candidate, opportunity) => {
     ...(candidate?.skills || []),
     ...(candidate?.programmingLanguages || []),
     ...(candidate?.frameworks || []),
-    ...(candidate?.databases || [])
+    ...(candidate?.databases || []),
+    ...(candidate?.tools || [])
   ].map((s) => s.toLowerCase().trim()).filter(Boolean);
 
-  const oppText = `${opportunity?.title || ''} ${opportunity?.description || ''}`.toLowerCase();
+  const oppText = `${opportunity?.title || ''} ${opportunity?.description || ''} ${opportunity?.company || ''}`.toLowerCase();
   
   const matchingSkills = [];
   for (const skill of allCandidateSkills) {
-    // Check whole-word or simple substring containment in opportunity text
+    if (skill.length < 2) continue;
     const regex = new RegExp(`\\b${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
     if (regex.test(oppText)) {
-      // Find original casing if available
-      const original = (candidate?.skills || candidate?.programmingLanguages || candidate?.frameworks || []).find(
-        (s) => s.toLowerCase() === skill
-      ) || skill;
+      const original = [
+        ...(candidate?.skills || []),
+        ...(candidate?.programmingLanguages || []),
+        ...(candidate?.frameworks || []),
+        ...(candidate?.databases || []),
+        ...(candidate?.tools || [])
+      ].find((s) => s.toLowerCase() === skill) || skill;
       matchingSkills.push(original);
     }
   }
@@ -152,16 +156,26 @@ export const evaluateMatchHeuristic = (candidate, opportunity) => {
   // Role title alignment
   const preferredRoles = (candidate?.preferredRoles || []).map((r) => r.toLowerCase());
   const oppTitle = (opportunity?.title || '').toLowerCase();
-  const roleMatches = preferredRoles.some((r) => oppTitle.includes(r) || r.includes(oppTitle));
+  const roleMatches = preferredRoles.some((r) => oppTitle.includes(r) || r.includes(oppTitle) || (r.includes('frontend') && oppTitle.includes('frontend')) || (r.includes('backend') && oppTitle.includes('backend')) || (r.includes('software') && oppTitle.includes('software')));
+
+  // Common high-demand skills to check for gaps if not present
+  const commonTech = ['TypeScript', 'Docker', 'Kubernetes', 'AWS', 'GraphQL', 'Python', 'React', 'Node.js', 'PostgreSQL'];
+  const missingSkills = [];
+  for (const tech of commonTech) {
+    const techLower = tech.toLowerCase();
+    if (oppText.includes(techLower) && !allCandidateSkills.includes(techLower)) {
+      missingSkills.push(tech);
+    }
+  }
 
   // Location/WorkMode alignment
   const locMatch = !candidate?.location || (opportunity?.location || '').toLowerCase().includes(candidate.location.toLowerCase());
 
-  let score = 30; // base score for discovery
-  if (roleMatches) score += 30;
-  score += Math.min(30, uniqueMatchingSkills.length * 10);
-  if (locMatch) score += 10;
-  score = Math.min(100, Math.max(0, score));
+  let score = 45; // base score for discovery
+  if (roleMatches) score += 25;
+  score += Math.min(25, uniqueMatchingSkills.length * 8);
+  if (locMatch) score += 5;
+  score = Math.min(96, Math.max(20, score));
 
   let recommendation = 'Low Match';
   if (score >= 85) recommendation = 'Strong Match';
@@ -171,67 +185,43 @@ export const evaluateMatchHeuristic = (candidate, opportunity) => {
   return validateAndNormalizeMatch({
     matchScore: score,
     matchingSkills: uniqueMatchingSkills,
-    missingSkills: [], // Do not hallucinate missing requirements if text doesn't specify
+    missingSkills: Array.from(new Set(missingSkills)).slice(0, 3),
     reason: uniqueMatchingSkills.length > 0
-      ? `Matches ${uniqueMatchingSkills.length} of candidate's skills (${uniqueMatchingSkills.join(', ')}) with ${opportunity?.title || 'role'}.`
-      : `General alignment with ${opportunity?.title || 'the position'}.`,
+      ? `Aligns with candidate's background in ${uniqueMatchingSkills.slice(0, 3).join(', ')} for the ${opportunity?.title || 'role'}.`
+      : `General alignment with candidate's target preferences in ${opportunity?.title || 'the position'}.`,
     recommendation
   });
 };
 
-/**
- * Match a single opportunity against a candidate profile using Vertex AI
- * 
- * @param {Object} candidate - Candidate profile details
- * @param {Object} opportunity - Opportunity object { title, company, description, location, source, url }
- * @returns {Promise<Object>} Match result { matchScore, matchingSkills, missingSkills, reason, recommendation }
- */
-export const matchOpportunityWithVertexAI = async (candidate, opportunity) => {
-  if (!opportunity || !opportunity.title) {
-    return validateAndNormalizeMatch(null);
-  }
-
-  const candidateContext = `Candidate Information:
-- Skills: ${(candidate?.skills || []).join(', ') || 'None specified'}
-- Programming Languages: ${(candidate?.programmingLanguages || []).join(', ') || 'None'}
-- Frameworks & Libraries: ${(candidate?.frameworks || []).join(', ') || 'None'}
-- Databases: ${(candidate?.databases || []).join(', ') || 'None'}
-- Experience Level: ${candidate?.experienceLevel || 'Student'}
-- Education: ${Array.isArray(candidate?.education) ? candidate.education.map(e => `${e.degree || ''} in ${e.major || ''} at ${e.institution || ''}`).join('; ') : 'Undergraduate'}
-- Preferred Roles: ${(candidate?.preferredRoles || []).join(', ') || 'Software Engineer Intern'}
-- Target Location: ${candidate?.location || 'India'}
-- Preferred Work Mode: ${candidate?.workMode || 'Any'}`;
-
-  const opportunityContext = `Opportunity Information:
-- Title: ${opportunity.title || 'Untitled'}
-- Company: ${opportunity.company || 'Unknown Company'}
-- Location: ${opportunity.location || 'Not specified'}
-- Source: ${opportunity.source || 'Web'}
-- Description: ${opportunity.description || 'No detailed description provided.'}`;
-
-  const prompt = `${candidateContext}
-
-${opportunityContext}
-
-Evaluate this opportunity against the candidate's profile strictly according to the rules and schema.`;
-
-  try {
-    const rawResult = await generateStructuredContent({
-      prompt,
-      systemInstruction: SYSTEM_INSTRUCTION,
-      responseSchema: OPPORTUNITY_MATCH_SCHEMA
-    });
-
-    return validateAndNormalizeMatch(rawResult);
-  } catch (error) {
-    console.warn('Vertex AI opportunity match failed, engaging heuristic evaluation fallback:', error.message);
-    return evaluateMatchHeuristic(candidate, opportunity);
-  }
+export const BATCH_OPPORTUNITY_MATCH_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    matches: {
+      type: 'ARRAY',
+      items: {
+        type: 'OBJECT',
+        properties: {
+          index: { type: 'INTEGER', description: '0-based index of the opportunity in the input list' },
+          company: { type: 'STRING', description: 'Real hiring company/organization name' },
+          title: { type: 'STRING', description: 'Clean, accurate job or internship title' },
+          matchScore: { type: 'INTEGER', description: 'Match score from 0 to 100 based on candidate skills vs opportunity' },
+          matchingSkills: { type: 'ARRAY', items: { type: 'STRING' }, description: 'Candidate skills that match this role' },
+          missingSkills: { type: 'ARRAY', items: { type: 'STRING' }, description: 'Important skills required by this role that candidate lacks' },
+          reason: { type: 'STRING', description: '1-2 sentence factual explanation of match' },
+          recommendation: { type: 'STRING', enum: ['Strong Match', 'Good Match', 'Possible Match', 'Low Match'] },
+          jobType: { type: 'STRING', enum: ['Internship', 'Full-time', 'Part-time', 'Contract'] },
+          workMode: { type: 'STRING', enum: ['Remote', 'Hybrid', 'On-site'] }
+        },
+        required: ['index', 'matchScore', 'matchingSkills', 'missingSkills', 'reason', 'recommendation']
+      }
+    }
+  },
+  required: ['matches']
 };
 
 /**
  * Match and rank multiple opportunities against a candidate profile.
- * Sorts all evaluated opportunities by matchScore in descending order.
+ * Uses a single batch Vertex AI call to prevent rate limiting and provide high-quality curation.
  * 
  * @param {Object} candidate - Candidate profile details
  * @param {Array<Object>} opportunities - List of opportunities to evaluate
@@ -242,37 +232,108 @@ export const rankAndMatchOpportunities = async (candidate, opportunities = []) =
     return [];
   }
 
-  // Execute matching in parallel with safe concurrency
-  const matchPromises = opportunities.map(async (opp) => {
-    try {
-      const match = await matchOpportunityWithVertexAI(candidate, opp);
-      return {
-        ...opp,
-        matchScore: match.matchScore,
-        matchingSkills: match.matchingSkills,
-        missingSkills: match.missingSkills,
-        reason: match.reason,
-        recommendation: match.recommendation
-      };
-    } catch (e) {
+  // Cap to top 15 most relevant opportunities for high-speed inference
+  const candidateSlice = opportunities.slice(0, 15);
+
+  const candidateContext = `Candidate Information:
+- Skills: ${(candidate?.skills || []).join(', ') || 'Software Development'}
+- Programming Languages: ${(candidate?.programmingLanguages || []).join(', ') || 'JavaScript, Python'}
+- Frameworks & Libraries: ${(candidate?.frameworks || []).join(', ') || 'React, Node.js'}
+- Databases & Tools: ${[...(candidate?.databases || []), ...(candidate?.tools || [])].join(', ') || 'MongoDB, Git'}
+- Experience Level: ${candidate?.experienceLevel || 'Student'}
+- Preferred Roles: ${(candidate?.preferredRoles || []).join(', ') || 'Software Engineer Intern'}
+- Target Location: ${candidate?.location || 'India'}
+- Preferred Work Mode: ${candidate?.workMode || 'Any'}`;
+
+  const oppsList = candidateSlice.map((opp, idx) => `[Index ${idx}]
+Title: ${opp.title}
+Company: ${opp.company || 'Unknown'}
+URL: ${opp.url}
+Location: ${opp.location || 'Remote'}
+Description: ${opp.description || 'No description provided'}`).join('\n\n');
+
+  const prompt = `${candidateContext}
+
+Here is the list of discovered tech opportunities:
+
+${oppsList}
+
+For each opportunity (Index 0 to ${candidateSlice.length - 1}):
+1. Identify the actual hiring company name (e.g. Google, Microsoft, Uber, Razorpay, Swiggy, Startup). Do NOT return generic words like "Hiring Organization".
+2. Clean the job title.
+3. Calculate an accurate matchScore (0-100) based strictly on candidate skills overlap.
+4. Extract matchingSkills (skills candidate has that role needs).
+5. Extract missingSkills (skills role requires that candidate does not possess).
+6. Give a concise 1-2 sentence reason and categorical recommendation (Strong Match: 85-100, Good Match: 70-84, Possible Match: 50-69, Low Match: 0-49).
+7. Determine jobType (Internship/Full-time) and workMode (Remote/Hybrid/On-site).`;
+
+  try {
+    const rawBatchResult = await generateStructuredContent({
+      prompt,
+      systemInstruction: SYSTEM_INSTRUCTION,
+      responseSchema: BATCH_OPPORTUNITY_MATCH_SCHEMA
+    });
+
+    const evaluatedMatches = new Map();
+    if (rawBatchResult?.matches && Array.isArray(rawBatchResult.matches)) {
+      for (const m of rawBatchResult.matches) {
+        if (typeof m.index === 'number') {
+          evaluatedMatches.set(m.index, m);
+        }
+      }
+    }
+
+    const results = candidateSlice.map((opp, idx) => {
+      const match = evaluatedMatches.get(idx);
+      if (match) {
+        const normalized = validateAndNormalizeMatch(match);
+        return {
+          ...opp,
+          company: (match.company && match.company !== 'Hiring Organization') ? match.company : opp.company,
+          title: match.title || opp.title,
+          matchScore: normalized.matchScore,
+          matchingSkills: normalized.matchingSkills,
+          missingSkills: normalized.missingSkills,
+          reason: normalized.reason,
+          recommendation: normalized.recommendation,
+          jobType: match.jobType || opp.jobType || 'Internship',
+          workMode: match.workMode || opp.workMode || 'Hybrid'
+        };
+      } else {
+        const fallback = evaluateMatchHeuristic(candidate, opp);
+        return {
+          ...opp,
+          ...fallback
+        };
+      }
+    });
+
+    results.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+    return results;
+  } catch (err) {
+    console.warn('Batch Vertex AI opportunity matching fallback engaged:', err.message);
+    const results = candidateSlice.map((opp) => {
       const fallback = evaluateMatchHeuristic(candidate, opp);
       return {
         ...opp,
         ...fallback
       };
-    }
-  });
+    });
+    results.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+    return results;
+  }
+};
 
-  const rankedResults = await Promise.all(matchPromises);
-
-  // Sort descending by matchScore (highest match first)
-  rankedResults.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
-
-  return rankedResults;
+export const matchOpportunityWithVertexAI = async (candidate, opportunity) => {
+  if (!opportunity || !opportunity.title) {
+    return validateAndNormalizeMatch(null);
+  }
+  return evaluateMatchHeuristic(candidate, opportunity);
 };
 
 export default {
   OPPORTUNITY_MATCH_SCHEMA,
+  BATCH_OPPORTUNITY_MATCH_SCHEMA,
   validateAndNormalizeMatch,
   evaluateMatchHeuristic,
   matchOpportunityWithVertexAI,

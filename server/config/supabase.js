@@ -27,6 +27,20 @@ export const validateSupabaseConfig = () => {
   };
 };
 
+// Provide a lightweight WebSocket fallback in environments where global WebSocket is absent
+if (typeof globalThis.WebSocket === 'undefined') {
+  class NoopWebSocket {
+    constructor() {
+      this.readyState = 3; // CLOSED
+    }
+    addEventListener() {}
+    removeEventListener() {}
+    send() {}
+    close() {}
+  }
+  globalThis.WebSocket = NoopWebSocket;
+}
+
 /**
  * Initializes and returns server-side Supabase client using Service Role Key
  * NEVER expose this client or key to the frontend

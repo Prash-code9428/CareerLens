@@ -1,42 +1,153 @@
 # CareerLens
 
-AI-powered student placement and internship discovery platform that transforms resume understanding, live market opportunity research, and skill-gap intelligence into confident applications.
+> **Stop searching. Start matching.**
+
+[![React](https://img.shields.io/badge/Frontend-React%2018%20%2B%20Vite-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Google Cloud](https://img.shields.io/badge/Cloud-Google%20Cloud%20Run-4285F4?logo=googlecloud&logoColor=white)](https://cloud.google.com/run)
+[![Gemini](https://img.shields.io/badge/AI-Google%20Gemini%20%2F%20Vertex%20AI-8E75B2?logo=googlegemini&logoColor=white)](https://cloud.google.com/vertex-ai)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB%20Atlas-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Supabase](https://img.shields.io/badge/Storage-Supabase%20Storage-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
+[![Context.dev](https://img.shields.io/badge/Search-Context.dev%20Web%20API-000000)](https://context.dev/)
 
 ---
 
-## What It Does
+CareerLens is an AI-powered student placement and internship discovery platform that transforms how university students and early-career engineers transition from a static resume to active, highly relevant career opportunities.
 
-CareerLens helps students discover relevant jobs and internships by:
-1. **Understanding their resume**: Securely extracting structured technical competencies, projects, and education from PDF resumes using Google Cloud Vertex AI.
-2. **Researching live opportunities**: Generating targeted search queries to discover active 2026 hiring listings via Context.dev live web search.
-3. **Matching skills with clarity**: Evaluating candidate skills against explicitly stated role requirements, computing transparent match scores, pinpointing matching and missing skills, and providing actionable AI recommendations.
+Rather than relying on manual keyword searches across disconnected job boards, CareerLens provides an intelligent, end-to-end workflow:
 
----
+$$\text{Resume Understanding} \longrightarrow \text{Live Market Research} \longrightarrow \text{AI Compatibility Matching} \longrightarrow \text{Skill-Gap Identification} \longrightarrow \text{Informed Application}$$
 
-## Problem Definition
-
-* **Target Users**: University students and early-career candidates preparing for internships, campus placements, and entry-level software engineering roles.
-* **Information Overload & Search Fatigue**: Job postings are scattered across dozens of career portals, bloated with repetitive text and ambiguous requirements.
-* **Qualification Uncertainty**: Students often hesitate or abandon applications because they cannot tell whether missing one or two listed skills disqualifies them.
-* **Fragmented Tooling**: Students currently juggle static resume builders, generic keyword checkers, and fragmented job boards that offer no integrated insight into why a candidate is or isn't a fit.
+By analyzing the candidate's actual projects, verified skills, and technical depth first, CareerLens actively explores live hiring boards and scores every opportunity with transparent match percentages, matching competencies, and concrete missing skill breakdowns.
 
 ---
 
-## Evidence of Student Need
+## 🚨 The Problem
 
-Findings from student survey research stored in [`evidence/README.md`](evidence/README.md) (Sample size: 16 tech students and early-career candidates) confirm the friction:
+University students and early-career candidates face recurring friction during internship and campus placement preparation:
 
-* **Application Fatigue**: **43.8%** of respondents spend 15–30+ minutes manually tailoring their resume for each application; **25.0%** have refrained from applying because the manual tailoring process takes too much time.
-* **Hesitation & Uncertainty**: When missing 1 or 2 listed skills, **37.5%** frequently hesitate to apply and **62.5%** sometimes hesitate (**0%** apply without hesitation).
-* **Lack of Visibility**: **56.3%** guess and hope for the best regarding how their qualifications align with job descriptions.
-* **Key Student Feedback**:
-  > *"Job descriptions are often long, repetitive, and filled with 'nice-to-have' skills, making it hard to tell what I truly need to qualify for the role."*
-  >
-  > *"The most valuable feature would be personalized skill-gap analysis with a clear action plan—showing exactly what skills I'm missing for the jobs I want and what to learn next."*
+* **Scattered Opportunities**: Openings are dispersed across dozens of ATS portals (Greenhouse, Lever, Ashby, Workday) and company career pages with no unified discovery layer.
+* **Information Overload & Search Fatigue**: Students spend hours manually searching, opening multiple tabs, and parsing long, repetitive job descriptions filled with generic boilerplate.
+* **Generic Keyword Boards**: Traditional job boards match on superficial keyword strings without understanding the candidate's actual technical depth, project context, or coursework.
+* **Qualification Uncertainty**: When a role lists 8–10 requirements and a student possesses 6, they often experience severe hesitation or abandon the application entirely because they cannot determine if missing 1 or 2 skills disqualifies them.
+* **Invisible Skill Gaps**: Job boards show job listings, but never explain *why* a candidate fits or *what specific skills* they need to learn to bridge the gap.
 
 ---
 
-## Existing Tools Gap
+## 💡 Our Solution
+
+CareerLens is built as an **integrated candidate-first intelligence workflow** rather than a passive job aggregator.
+
+Instead of scraping random listings and expecting the student to filter them manually, CareerLens starts with the candidate:
+
+1. **Understands the Candidate First**: Ingests and parses the student's PDF resume to extract structured technical skills, frameworks, databases, tools, projects, and education.
+2. **Researches Live Opportunities**: Dynamically formulates targeted ATS search queries and explores active company career sites via the Context.dev web search API.
+3. **Performs Objective AI Matching**: Evaluates the candidate's verified profile against each opportunity using Gemini / Google Cloud Vertex AI, adhering to strict structured schemas.
+4. **Delivers Transparent Insights**: Provides a 0–100% compatibility score, explicit highlights of matching skills, precise identification of missing skills, and clear AI recommendations with direct application links.
+
+---
+
+
+## 🔗 Live Link
+
+* **Live Application**: [https://careerlens-511006.web.app](https://careerlens-511006.web.app)
+
+---
+
+## ✨ Key Features
+
+* 🔐 **Secure Authentication**: JWT-based session security, password hashing via `bcryptjs`, and protected candidate profiles.
+* 📄 **Encrypted Resume Management**: Validated PDF resume upload stored in user-isolated Supabase Storage buckets.
+* 🧠 **AI Resume Intelligence**: Structured extraction of candidate summaries, programming languages, frameworks, developer tools, and academic backgrounds.
+* 🌐 **Live Web Discovery**: Targeted ATS discovery (Greenhouse, Lever, Ashby, direct career portals) powered by Context.dev.
+* 🎯 **AI Compatibility Matching**: Strict schema-grounded matching providing transparent 0–100 placement scoring (*Strong Match*, *Good Match*, *Possible Match*, *Low Match*).
+* 🔍 **Skill-Gap Analysis**: Clear side-by-side view of competencies you possess versus missing skills required for the role.
+* ⚡ **Interactive Filtering & Sorting**: Instant client-side filters for Job Type (Internship / Full-time), Work Mode (Remote, Hybrid, On-site), Match Score thresholds, and keyword search.
+* 🔗 **Direct One-Click Apply**: Direct outbound links (`target="_blank"`) to verified employer application pages.
+
+---
+
+## 🔄 How CareerLens Works
+
+```mermaid
+flowchart TD
+    A([User Uploads PDF Resume]) --> B[In-Memory PDF Parsing & Text Sanitization]
+    B --> C[Google Cloud / Gemini AI Intelligence]
+    C --> D[(Structured Candidate Profile in MongoDB)]
+    
+    D --> E[Dynamic ATS Query Generation]
+    E --> F[Context.dev Live Web Search API]
+    F --> G[Live Company Job & Internship Postings]
+    
+    G --> H[AI Batch Compatibility Engine]
+    D --> H
+    
+    H --> I[Compatibility Score 0-100%]
+    H --> J[Matching Competencies]
+    H --> K[Missing Skill Gaps]
+    H --> L[AI Recommendation Reasoning]
+    
+    I & J & K & L --> M[Interactive Placement Dashboard]
+    M --> N([Direct Outbound Application])
+```
+
+---
+
+## 🏗️ Architecture
+
+```
+React 18 + Vite (SPA Frontend)
+        │
+        ▼ HTTPS / REST (JWT Auth)
+Google Cloud Run (Serverless Container)
+        │
+        ▼
+Node.js + Express API Server
+   ├── MongoDB Atlas          → Candidate profiles, credentials, preferences
+   ├── Supabase Storage       → Encrypted, user-isolated PDF resume documents
+   ├── Context.dev Web API    → Real-time hiring portal search & discovery
+   └── Gemini / Vertex AI     → Structured resume intelligence & placement scoring
+```
+
+### Architectural Decisions:
+* **React + Vite**: Delivers sub-second local updates, fast page transitions, and smooth client-side filtering without layout thrashing.
+* **Node.js + Express**: Non-blocking asynchronous runtime handling file streams, multi-query web searches, and batch AI evaluations.
+* **MongoDB Atlas**: Document-oriented persistence perfectly suited for evolving candidate profile schemas and flexible search preferences.
+* **Supabase Storage**: S3-compatible managed object storage with strict MIME/size validation and isolated paths (`resumes/{userId}/resume.pdf`).
+* **Context.dev**: Live search engine optimized for developer and job market research across enterprise ATS platforms.
+* **Google Cloud Vertex AI / Gemini API**: Generative foundation models producing strict JSON outputs conforming to OpenAPI schemas.
+* **Google Cloud Run**: Fully managed serverless container runtime with built-in HTTPS, custom domains, and automatic scaling.
+
+---
+
+## 🧠 AI & Intelligence
+
+CareerLens utilizes Google's Gemini models (via Google Cloud Vertex AI & Google Gen AI SDK) across three distinct stages:
+
+1. **Resume Parser**: Transforms unstructured resume text into a normalized JSON candidate profile:
+   ```json
+   {
+     "summary": "Full Stack Developer with experience in React and Node.js microservices",
+     "skills": ["JavaScript", "Python", "React", "Node.js", "MongoDB", "Docker"],
+     "experienceLevel": "Student",
+     "preferredRoles": ["Software Engineer Intern", "Frontend Developer"]
+   }
+   ```
+2. **Search Query Synthesizer**: Formulates focused search queries targeting direct hiring boards rather than generic aggregators (e.g. `site:boards.greenhouse.io "Software Engineer Intern" "2026"`).
+3. **Structured Compatibility Matcher**: Executes schema-constrained batch evaluations comparing candidate facts against job requirements to produce deterministic match metrics:
+   ```json
+   {
+     "matchScore": 88,
+     "recommendation": "Strong Match",
+     "matchingSkills": ["React", "JavaScript", "REST APIs"],
+     "missingSkills": ["GraphQL", "AWS"],
+     "reason": "Strong alignment with core frontend stack. Missing cloud infrastructure experience can be quickly bridged."
+   }
+   ```
+
+---
+
+## 🎯 Why CareerLens?
 
 | Existing Approach | Limitation | CareerLens Advantage |
 | :--- | :--- | :--- |
@@ -47,128 +158,96 @@ Findings from student survey research stored in [`evidence/README.md`](evidence/
 
 ---
 
-## What We Built
+## 👤 Who It's For
 
-* **JWT Authentication**: User registration, password hashing (`bcryptjs`), and secure session management.
-* **Candidate Profile**: Configurable educational background, target location, experience level, and preferred roles.
-* **Resume Upload & Storage**: PDF upload with 5MB validation, stored securely in Supabase Storage under user-isolated paths.
-* **Resume Text Extraction**: In-memory parsing (`pdf-parse`) with `%PDF-` header validation and whitespace cleanup.
-* **Vertex AI Resume Intelligence**: Structured extraction of summary, skills, programming languages, frameworks, databases, tools, projects, and verified certifications.
-* **Live Opportunity Research**: Dynamic generation of 3–5 search queries via Vertex AI and live web scraping through Context.dev.
-* **Vertex AI Opportunity Matching**: Ground-truth matching evaluating candidate skills against opportunity criteria adhering to OpenAPI schemas.
-* **Match Score & Recommendations**: Clamped 0–100 match scoring, categorizing roles into *Strong Match*, *Good Match*, *Possible Match*, or *Low Match*.
-* **Matching Skills & Skill Gaps**: Highlights candidate matching skills and explicitly identifies missing skills.
-* **Client-Side Filtering & Sorting**: Filter by Job Type, Work Mode, Match Score thresholds, and keyword search; sort by Best Match or Recently Found.
-* **Opportunity Details & Direct Apply**: Detailed view with reason breakdown and direct external application link (`target="_blank"`).
+* **University Students**: Preparing for campus placement seasons and summer internships.
+* **Early-Career Developers**: Transitioning into software engineering roles and seeking objective skill-gap feedback.
+* **Self-Taught & Bootcamp Graduates**: Identifying which additional industry technologies to learn based on real-time market demand.
 
 ---
 
-## Architecture
+## 🛠️ Tech Stack
 
-```
-React + Vite Frontend (SPA)
-        ↓  HTTPS (JWT Auth / REST)
-Google Cloud Run (Containerized Backend)
-        ↓
-Node.js + Express Server
-   ├── MongoDB Atlas       → Candidate profiles, credentials, preferences
-   ├── Supabase Storage    → Encrypted, user-isolated PDF resume documents
-   ├── Context.dev API     → Live web research & hiring portal scraping
-   └── Google Cloud Vertex AI → Resume intelligence & structured opportunity matching
-```
-
-### Why Each Component Was Chosen:
-* **React + Vite**: Fast build times, responsive client-side filtering, and polished dark-mode UI.
-* **Node.js + Express**: Lightweight, asynchronous I/O handling file buffers, AI prompts, and database operations.
-* **MongoDB Atlas**: Flexible document model for structured candidate profiles and evolving preference schemas.
-* **Supabase Storage**: Managed S3-compatible object storage with fine-grained bucket limits for resume files.
-* **Context.dev**: Live web search API that discovers real-time internship and job listings.
-* **Google Cloud Vertex AI**: Enterprise generative foundation models (`gemini-1.5-pro` / `gemini-2.5-flash`) providing structured JSON output conforming to strict OpenAPI schemas.
-* **Google Cloud Run**: Serverless container hosting with automatic scaling and native IAM service identity.
+* **Frontend**: React 18, Vite, React Router 6, Tailwind CSS, Lucide Icons, Axios
+* **Backend**: Node.js, Express, Mongoose (MongoDB ODM), Multer, `pdf-parse`, `bcryptjs`, `jsonwebtoken`
+* **AI & Language Models**: Google Cloud Vertex AI / Gemini (`@google-cloud/vertexai`, `@google/genai`)
+* **Live Web Research**: Context.dev Search API (`/v1/web/search`)
+* **Database & Storage**: MongoDB Atlas, Supabase Storage
+* **Cloud & Hosting**: Google Cloud Run (Backend), Firebase Hosting (Frontend)
 
 ---
 
-## Google Cloud / Vertex AI Integration
-
-* **AI Capabilities**: Powers candidate profile extraction from resume text and compatibility scoring for discovered opportunities.
-* **Local Development Authentication**: Uses **Application Default Credentials (ADC)** via the `gcloud` CLI (`gcloud auth application-default login`).
-* **Production Authentication (Cloud Run)**: Uses the attached Cloud Run **Runtime Service Account** with the `roles/aiplatform.user` IAM role.
-* **Zero Credential Bundling**: No service-account JSON files, private keys, or API keys are committed or bundled into Docker images.
-
----
-
-## How It Works
+## 📁 Project Structure
 
 ```
-1. Create Account & Setup Profile
-   └── Input education, graduation year, target location, and preferred roles.
-
-2. Upload Resume PDF
-   └── File is validated (≤ 5MB, PDF MIME/header) and uploaded to Supabase Storage.
-
-3. AI Resume Analysis (Vertex AI)
-   └── Text is parsed and normalized into structured skills, frameworks, and projects.
-
-4. Find Opportunities (Context.dev + Vertex AI)
-   └── Vertex AI crafts focused search queries; Context.dev scrapes active postings.
-
-5. AI Compatibility Matching
-   └── Vertex AI computes match score, matching competencies, and missing skill gaps.
-
-6. Filter, Review & Apply
-   └── Filter by match percentage, view detailed reasoning, and apply directly on the source listing.
+CareerLens/
+├── client/                     # React + Vite Frontend
+│   ├── public/                 # Static assets & SPA redirects
+│   ├── src/
+│   │   ├── components/         # Reusable UI (Navbar, Skeletons, Alerts, SearchBar)
+│   │   ├── context/            # AuthContext state management
+│   │   ├── pages/              # Landing, Login, Register, Dashboard, Opportunities
+│   │   └── services/           # Centralized API clients (api.js, opportunityService.js)
+│   └── package.json
+├── server/                     # Express Backend
+│   ├── config/                 # DB, Supabase, Google Cloud, Env Validators
+│   ├── controllers/            # Auth, Profile, Resume, Opportunity controllers
+│   ├── middleware/             # Auth (JWT), Upload (Multer), Error Handlers
+│   ├── models/                 # Mongoose User & CandidateProfile models
+│   ├── routes/                 # Express API route declarations
+│   ├── services/               # Vertex AI, Context.dev, PDF Parser, Opportunity Matcher
+│   ├── Dockerfile              # Production Node container image
+│   ├── testAuth.js             # Automated 78-assertion test suite runner
+│   └── package.json
+├── evidence/                   # User research & survey data
+│   ├── README.md               # Survey analysis & student insights
+│   └── Survey Responses.xlsx   # Survey dataset
+├── DEPLOYMENT.md               # Production deployment runbook
+├── .env.example                # Sample environment configuration template
+└── README.md                   # Project documentation
 ```
 
 ---
 
-## How To Run Locally
+## 🚀 Getting Started
 
 ### 1. Prerequisites
 * **Node.js** (v18.0.0 or higher)
 * **npm** (v9.0.0 or higher)
-* **Google Cloud CLI** (for local Vertex AI authentication)
-* **MongoDB Atlas** cluster URI
+* **MongoDB Atlas** database URI
 * **Supabase** project URL & Service Role Key
 * **Context.dev** API Key
+* **Google Gemini API Key** or **Google Cloud Vertex AI** credentials
 
-### 2. Configure Google Cloud Application Default Credentials (ADC)
-```bash
-gcloud auth login
-gcloud auth application-default login
-gcloud config set project YOUR_GOOGLE_CLOUD_PROJECT_ID
-gcloud services enable aiplatform.googleapis.com
-```
-
-### 3. Clone Repository & Setup Environment
+### 2. Clone Repository & Install Dependencies
 ```bash
 git clone https://github.com/Prash-code9428/CareerLens.git
 cd CareerLens
 
-# Create local environment file
-cp .env.example .env
-```
-
-### 4. Install Dependencies
-```bash
 # Install root, backend, and frontend dependencies
 npm run install:all
 ```
 
-### 5. Start Development Servers
+### 3. Configure Environment Variables
 ```bash
-# Option A: Run both services simultaneously in separate terminals
-# Terminal 1 (Backend):
+cp .env.example .env
+```
+Fill in the required keys in `.env` (see [Environment Variables](#-environment-variables)).
+
+### 4. Start Development Servers
+```bash
+# Run backend server (Port 5000 / 8080)
 npm run server
 
-# Terminal 2 (Frontend):
+# In a separate terminal, run frontend client (Port 5173)
 npm run client
 ```
 
-* Frontend is accessible at: `http://localhost:5173`
-* Backend API is accessible at: `http://localhost:8080` (or `http://localhost:5000`)
-* Health Check endpoint: `http://localhost:8080/api/health`
+* Frontend: `http://localhost:5173`
+* Backend API: `http://localhost:5000` (or `http://localhost:8080`)
+* Health Check: `http://localhost:5000/api/health`
 
-### 6. Run Test Suite
+### 5. Run Automated Tests
 ```bash
 cd server
 npm test
@@ -176,122 +255,67 @@ npm test
 
 ---
 
-## Environment Variables
+## 🔐 Environment Variables
 
-Configure these variables in your root `.env` file (refer to [`.env.example`](.env.example)):
-
-```env
-# Server Configuration
-PORT=8080
-NODE_ENV=development
-CLIENT_URL=http://localhost:5173
-MONGODB_URI=
-JWT_SECRET=
-
-# Supabase Storage Configuration
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
-SUPABASE_BUCKET=resumes
-
-# Context.dev Live Search API
-CONTEXT_API_KEY=
-CONTEXT_API_ENDPOINT=https://api.context.dev/v1/web/search
-
-# Google Cloud / Vertex AI
-GOOGLE_CLOUD_PROJECT_ID=
-VERTEX_AI_LOCATION=us-central1
-VERTEX_AI_MODEL=gemini-1.5-pro
-
-# Frontend Configuration (Vite)
-VITE_API_BASE_URL=http://localhost:8080
-```
+| Variable | Description | Required For |
+| :--- | :--- | :--- |
+| `PORT` | Backend server port (Default: `5000` or `8080`) | Server |
+| `NODE_ENV` | Runtime environment (`development` or `production`) | Server |
+| `MONGODB_URI` | MongoDB connection string | Database |
+| `JWT_SECRET` | Secret key for signing JSON Web Tokens | Authentication |
+| `CLIENT_URL` | Allowed CORS origins (comma-separated for multiple) | Security |
+| `SUPABASE_URL` | Supabase project instance URL | Resume Storage |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role secret key | Resume Storage |
+| `SUPABASE_BUCKET` | Supabase storage bucket name (Default: `resumes`) | Resume Storage |
+| `CONTEXT_API_KEY` | Context.dev web search API key | Live Job Search |
+| `GEMINI_API_KEY` | Google AI Studio Gemini API Key | AI Intelligence |
+| `GOOGLE_CLOUD_PROJECT_ID` | Google Cloud Project ID (Optional if using Gemini Key) | Vertex AI |
+| `VERTEX_AI_LOCATION` | Vertex AI regional endpoint (Default: `us-central1`) | Vertex AI |
+| `VERTEX_AI_MODEL` | Gemini model name (e.g. `gemini-3.8-flash` / `gemini-1.5-flash`) | AI Intelligence |
+| `VITE_API_BASE_URL` | Base backend API URL consumed by the frontend | Frontend |
 
 ---
 
-## Tools and AI Used
+## ☁️ Deployment
 
-* **Frontend**: React 18, Vite, React Router 6, Tailwind CSS, Lucide Icons, Axios
-* **Backend**: Node.js, Express, Mongoose (MongoDB ODM), Multer, `pdf-parse`, `bcryptjs`, `jsonwebtoken`
-* **Cloud & Storage**: Google Cloud Run, Google Cloud Artifact Registry, Supabase Storage, MongoDB Atlas
-* **Web Search**: Context.dev Search API (`/v1/web/search`)
-* **AI & Machine Learning**: Google Cloud Vertex AI (`@google-cloud/vertexai` with Gemini models)
-* **Development & IDE**: Antigravity IDE (DeepMind Agentic AI pair programming)
+* **Backend**: Containerized via Docker and deployed to **Google Cloud Run** with managed HTTPS and auto-scaling.
+* **Frontend**: Built via Vite and hosted globally on **Firebase Hosting**.
+* **Storage & Database**: Hosted on managed **MongoDB Atlas** and **Supabase Storage**.
 
----
-
-## Who It Is For
-
-* **Students preparing for campus placements**: Understand resume match readiness and identify missing technical skills.
-* **Internship seekers**: Discover active 2026 internships matching current skills without manual job board fatigue.
-* **Early-career engineers**: Bridge skill gaps with structured feedback on explicitly required technologies.
+For detailed deployment instructions, refer to [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ---
 
-## Signs Students Would Use It
+## 📊 Evidence of Student Need
 
-* **Survey Validation**: **100%** of surveyed students reported hesitation when applying if missing 1–2 skills, showing strong demand for objective skill-gap feedback.
-* **Time Savings**: Eliminates the 15–30+ minutes spent manually comparing resumes against bloated job posts.
-* **Transparency**: Clear separation between proven skills and skill gaps provides clarity over vague keyword checkers.
+Findings from primary student survey research stored in [`evidence/README.md`](evidence/README.md) ($N = 16$ tech students and early-career candidates) highlight the core problems CareerLens solves:
 
----
-
-## Done / Left / Plan
-
-### ✅ Completed (Done)
-- [x] Full JWT authentication and user profile management
-- [x] PDF resume upload to Supabase Storage with format & size validation
-- [x] Server-side PDF text extraction and normalization
-- [x] Vertex AI structured resume parsing into candidate competencies
-- [x] Context.dev live web opportunity discovery with rate-limit pacing
-- [x] Vertex AI opportunity compatibility scoring, matching skills, and gap identification
-- [x] Client-side filtering by Job Type, Work Mode, Match Score, and Search
-- [x] Opportunity details view with direct external application links
-- [x] Reusable loading skeletons, inline error alerts, and retry states
-- [x] Production Dockerfile and Google Cloud Run deployment configuration
-- [x] 78/78 automated test suite passing cleanly
-
-### 📋 Planned Enhancements (Plan)
-- [ ] Direct skill-gap learning resource recommendations (courses, documentation).
-- [ ] Application history tracker to log applied roles and status.
-- [ ] Multi-resume version management (tailored resumes per target domain).
+* **Application Fatigue**: **43.8%** spend 15–30+ minutes manually tailoring resumes per application; **25.0%** have refrained from applying because the manual tailoring process takes too much time.
+* **Hesitation & Uncertainty**: When missing 1 or 2 listed skills, **37.5%** frequently hesitate to apply and **62.5%** sometimes hesitate (**0%** apply without hesitation).
+* **Lack of Alignment Visibility**: **56.3%** guess and hope for the best regarding how their qualifications align with job descriptions.
+* **Student Testimonial**:
+  > *"Job descriptions are often long, repetitive, and filled with 'nice-to-have' skills, making it hard to tell what I truly need to qualify for the role. The most valuable feature would be personalized skill-gap analysis showing exactly what skills I'm missing for the jobs I want."*
 
 ---
 
-## Demo
+## 📌 Project Status
 
-* **Local Demo**: Run `npm run server` and `npm run client` to interact with CareerLens locally at `http://localhost:5173`.
-* **Health Endpoint**: `GET /api/health` returns `{ "success": true, "message": "CareerLens API is running" }`.
+### ✅ Completed
+- [x] JWT authentication and secure session management
+- [x] Candidate profile configuration (education, target roles, location, work mode)
+- [x] Secure PDF resume upload to Supabase Storage with size and MIME validation
+- [x] Text parsing and Gemini / Vertex AI structured candidate competency extraction
+- [x] Context.dev live web opportunity discovery with concurrency management
+- [x] Batch AI opportunity compatibility matching, score calculation, and skill-gap breakdown
+- [x] Multi-criteria client-side filtering (Job Type, Work Mode, Match Score, Keyword search)
+- [x] Direct outbound application links to verified hiring portals
+- [x] Cloud Run containerized backend and Firebase Hosting frontend deployment
+- [x] 78/78 automated test suite covering Auth, Storage, Parsing, Search, and AI Matching
+
+### 📋 Future Roadmap
+- [ ] Automated skill-gap learning pathways (curated documentation and tutorial links).
+- [ ] Application status tracker (Applied, Interviewing, Offered).
+- [ ] Multi-resume versioning tailored per target domain (e.g., Frontend vs. Machine Learning).
 
 ---
 
-## Repository Structure
-
-```
-CareerLens/
-├── client/                     # React + Vite Frontend
-│   ├── public/                 # Static assets & SPA redirects (_redirects)
-│   ├── src/
-│   │   ├── components/         # Reusable UI (Navbar, Skeletons, Alerts, Uploaders)
-│   │   ├── context/            # AuthContext state management
-│   │   ├── pages/              # Landing, Login, Register, Dashboard, Opportunities
-│   │   └── services/           # Centralized Axios API client (api.js)
-│   └── package.json
-├── server/                     # Express Backend
-│   ├── config/                 # DB, Supabase, Google Cloud, Env Validators
-│   ├── controllers/            # Auth, Profile, Resume, Opportunity controllers
-│   ├── middleware/             # Auth, Upload (Multer), Error Sanitization
-│   ├── models/                 # Mongoose User model
-│   ├── routes/                 # Express API routes
-│   ├── services/               # Vertex AI, Context.dev, PDF Parser, Opportunity Matcher
-│   ├── Dockerfile              # Production Node 20 Alpine container image
-│   ├── testAuth.js             # Automated 78-test E2E & unit test runner
-│   └── package.json
-├── evidence/                   # User research & survey responses
-│   ├── README.md               # Survey data breakdown & qualitative findings
-│   └── Survey Responses.xlsx   # Survey response data
-├── DEPLOYMENT.md               # Google Cloud Run deployment guide
-├── .env.example                # Sample environment configuration
-├── .dockerignore               # Container build exclusions
-├── .gitignore                  # Git exclusions (credentials, node_modules)
-└── README.md                   # Hackathon documentation
-```
