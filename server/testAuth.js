@@ -6,11 +6,12 @@ import { protect } from './middleware/authMiddleware.js';
 import { validateGoogleCloudConfig } from './config/googleCloud.js';
 import { checkVertexAIHealth } from './services/vertexAI.js';
 import { validateSupabaseConfig, SUPABASE_BUCKET } from './config/supabase.js';
+import { cleanExtractedText, extractTextFromBuffer } from './services/resumeParser.js';
 
 process.env.JWT_SECRET = 'test-secret-key-for-careerlens-2026';
 
 async function runVerificationTests() {
-  console.log('🧪 Starting CareerLens Verification Tests (Auth, Profile, Vertex AI & Supabase Upload)...\n');
+  console.log('🧪 Starting CareerLens Verification Tests (Auth, Profile, Vertex AI, Supabase & PDF Parser)...\n');
 
   let passed = 0;
   let total = 0;
@@ -111,15 +112,62 @@ async function runVerificationTests() {
   assert(typeof supabaseConfig.isConfigured === 'boolean', 'Supabase config validator evaluates configuration status');
   assert(supabaseConfig.bucket === 'resumes' || SUPABASE_BUCKET === 'resumes', 'Default Supabase bucket is resumes');
 
-  // Test 5: Resume Storage Path formatting
+  // Resume Storage Path formatting
   const expectedPath = `${SUPABASE_BUCKET}/${dummyUserId}/resume.pdf`;
   mockUserDoc.resumePath = expectedPath;
   assert(mockUserDoc.resumePath === 'resumes/65b1234567890abcdef12345/resume.pdf', 'Resume storage path correctly formats to resumes/{userId}/resume.pdf');
 
+  // --- Resume Parser & Extraction Tests ---
+  // Test 6: Text cleaning
+  const dirtyText = "  Software Engineer   \n\n\n\nReact, Node.js, MongoDB \t\t  ";
+  const cleaned = cleanExtractedText(dirtyText);
+  assert(cleaned === "Software Engineer\n\nReact, Node.js, MongoDB", 'cleanExtractedText normalizes excessive whitespace and newlines');
+
+  // Test 7: Reject non-PDF or corrupted buffer
+  let corruptedRejected = false;
+  try {
+    await extractTextFromBuffer(Buffer.from('Not a PDF at all'));
+  } catch (err) {
+    corruptedRejected = err.code === 'INVALID_PDF_HEADER';
+  }
+  assert(corruptedRejected, 'extractTextFromBuffer rejects non-PDF buffer header');
+
+  // Test 8: Valid minimal PDF extraction
+  const validPdfRaw = `%PDF-1.4
+1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj
+2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj
+3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj
+4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj
+5 0 obj << /Length 75 >> stream
+BT
+/F1 12 Tf
+72 712 Td
+(Prashant Sharma - Full Stack Developer - React Node.js MongoDB) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000224 00000 n 
+0000000293 00000 n 
+trailer << /Size 6 /Root 1 0 R >>
+startxref
+420
+%%EOF`;
+
+  const validPdfBuffer = Buffer.from(validPdfRaw, 'utf-8');
+  const extraction = await extractTextFromBuffer(validPdfBuffer);
+  assert(extraction.charCount > 20, 'extractTextFromBuffer extracts text from valid PDF');
+  assert(extraction.text.includes('Full Stack Developer'), 'Extracted text content matches resume text');
+
   console.log(`\n📊 Test Results: ${passed}/${total} tests passed.`);
 
   if (passed === total) {
-    console.log('🎉 All Auth, Profile, Vertex AI, and Supabase Storage checks passed cleanly!\n');
+    console.log('🎉 All Auth, Profile, Vertex AI, Supabase Storage & PDF Parser checks passed cleanly!\n');
   } else {
     process.exit(1);
   }

@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import { getSupabaseClient, validateSupabaseConfig, SUPABASE_BUCKET } from '../config/supabase.js';
+import { downloadResumeBuffer, extractTextFromBuffer } from '../services/resumeParser.js';
 
 /**
  * @desc    Upload or replace resume PDF in Supabase Storage
@@ -63,6 +64,71 @@ export const uploadResume = async (req, res, next) => {
       resumePath: user.resumePath,
       user: user.toSafeObject()
     });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * @desc    Extract text from the authenticated user's uploaded resume PDF
+ * @route   POST /api/resume/extract
+ * @access  Private (JWT Protected)
+ */
+export const extractResumeText = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user || !user.resumePath) {
+      return res.status(400).json({
+        success: false,
+        message: 'No resume document found. Please upload your resume PDF first.'
+      });
+    }
+
+    // Retrieve PDF buffer from Supabase Storage
+    let pdfBuffer;
+    try {
+      pdfBuffer = await downloadResumeBuffer(user.resumePath);
+    } catch (storageErr) {
+      return res.status(404).json({
+        success: false,
+        message: storageErr.message || 'Unable to retrieve resume from storage.'
+      });
+    }
+
+    // Extract text from buffer
+    try {
+      const extractionResult = await extractTextFromBuffer(pdfBuffer);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Resume text extracted successfully',
+        numPages: extractionResult.numPages,
+        charCount: extractionResult.charCount,
+        text: extractionResult.text
+      });
+    } catch (parseErr) {
+      if (parseErr.code === 'NO_TEXT_FOUND') {
+        return res.status(422).json({
+          success: false,
+          code: 'IMAGE_ONLY_PDF',
+          message: parseErr.message
+        });
+      }
+
+      if (parseErr.code === 'INVALID_PDF_HEADER' || parseErr.code === 'PDF_PARSE_FAILED') {
+        return res.status(400).json({
+          success: false,
+          code: 'CORRUPTED_PDF',
+          message: parseErr.message
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: `PDF extraction failed: ${parseErr.message}`
+      });
+    }
   } catch (error) {
     return next(error);
   }
