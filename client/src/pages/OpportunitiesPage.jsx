@@ -6,18 +6,14 @@ import OpportunityCard from '../components/opportunities/OpportunityCard.jsx';
 import OpportunitySkeleton from '../components/opportunities/OpportunitySkeleton.jsx';
 import EmptyState from '../components/opportunities/EmptyState.jsx';
 import SearchButton from '../components/opportunities/SearchButton.jsx';
+import OpportunityFilters from '../components/opportunities/OpportunityFilters.jsx';
 import {
   Compass,
   Sparkles,
   LogOut,
-  User,
   Tag,
-  Filter,
-  ArrowUpDown,
-  Search,
-  CheckCircle2,
-  AlertCircle,
-  Briefcase
+  Briefcase,
+  RotateCcw
 } from 'lucide-react';
 
 export default function OpportunitiesPage() {
@@ -30,10 +26,12 @@ export default function OpportunitiesPage() {
   const [queries, setQueries] = useState([]);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // Client-side quick filter & sort (no extraneous web searches on filter changes)
-  const [selectedMatchFilter, setSelectedMatchFilter] = useState('ALL');
-  const [searchFilterKeyword, setSearchFilterKeyword] = useState('');
-  const [sortBy, setSortBy] = useState('matchScore_desc');
+  // Client-Side Filters & Sort State (Purely client-side, zero redundant API requests)
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [typeFilter, setTypeFilter] = useState('ALL'); // ALL, INTERNSHIP, JOB
+  const [workModeFilter, setWorkModeFilter] = useState('ALL'); // ALL, REMOTE, HYBRID, ON_SITE
+  const [matchScoreFilter, setMatchScoreFilter] = useState('ALL'); // ALL, 90, 80, 70
+  const [sortBy, setSortBy] = useState('best_match'); // best_match, recently_found
 
   const handleLogout = () => {
     logout();
@@ -48,12 +46,17 @@ export default function OpportunitiesPage() {
       const response = await opportunityService.searchOpportunities();
       if (response.success) {
         setQueries(response.queries || []);
-        setOpportunities(response.opportunities || []);
+        // Attach original index for stable "Recently Found" sorting
+        const rawOpps = (response.opportunities || []).map((opp, idx) => ({
+          ...opp,
+          _originalIndex: idx
+        }));
+        setOpportunities(rawOpps);
         setHasSearched(true);
         try {
-          sessionStorage.setItem('careerlens_opportunities', JSON.stringify(response.opportunities || []));
+          sessionStorage.setItem('careerlens_opportunities', JSON.stringify(rawOpps));
         } catch (e) {
-          // ignore storage error
+          // ignore sessionStorage write errors
         }
       } else {
         setError(response.message || 'Unable to discover opportunities.');
@@ -69,44 +72,87 @@ export default function OpportunitiesPage() {
     }
   };
 
+  const handleResetFilters = () => {
+    setSearchKeyword('');
+    setTypeFilter('ALL');
+    setWorkModeFilter('ALL');
+    setMatchScoreFilter('ALL');
+    setSortBy('best_match');
+  };
+
   const hasProfileContext = Boolean(
     user?.candidateProfile ||
     (user?.preferredRoles && user.preferredRoles.length > 0) ||
     user?.resumePath
   );
 
-  // Filter & sort logic applied purely client-side
+  // Filter & Sort Pipeline
   const filteredOpportunities = useMemo(() => {
     let list = [...opportunities];
 
-    // Match strength filter
-    if (selectedMatchFilter !== 'ALL') {
-      list = list.filter((opp) => opp.recommendation === selectedMatchFilter);
-    }
-
-    // Keyword text search filter
-    if (searchFilterKeyword.trim()) {
-      const kw = searchFilterKeyword.toLowerCase().trim();
+    // 1. Text Search across title, company, skills
+    if (searchKeyword.trim()) {
+      const kw = searchKeyword.toLowerCase().trim();
       list = list.filter((opp) => {
         const titleMatch = (opp.title || '').toLowerCase().includes(kw);
         const companyMatch = (opp.company || '').toLowerCase().includes(kw);
         const locationMatch = (opp.location || '').toLowerCase().includes(kw);
-        const skillMatch = (opp.matchingSkills || []).some((s) => s.toLowerCase().includes(kw));
-        return titleMatch || companyMatch || locationMatch || skillMatch;
+        const matchingSkillMatch = (opp.matchingSkills || []).some((s) => s.toLowerCase().includes(kw));
+        const missingSkillMatch = (opp.missingSkills || []).some((s) => s.toLowerCase().includes(kw));
+        const descMatch = (opp.description || '').toLowerCase().includes(kw);
+        return titleMatch || companyMatch || locationMatch || matchingSkillMatch || missingSkillMatch || descMatch;
       });
     }
 
-    // Sort
-    if (sortBy === 'matchScore_desc') {
+    // 2. Type Filter (All, Internship, Job)
+    if (typeFilter === 'INTERNSHIP') {
+      list = list.filter((opp) => {
+        const text = `${opp.title || ''} ${opp.jobType || ''}`.toLowerCase();
+        return text.includes('intern') || text.includes('internship') || text.includes('trainee');
+      });
+    } else if (typeFilter === 'JOB') {
+      list = list.filter((opp) => {
+        const text = `${opp.title || ''} ${opp.jobType || ''}`.toLowerCase();
+        return !text.includes('intern') && !text.includes('internship');
+      });
+    }
+
+    // 3. Work Mode Filter (All, Remote, Hybrid, On-site)
+    if (workModeFilter === 'REMOTE') {
+      list = list.filter((opp) => {
+        const text = `${opp.title || ''} ${opp.workMode || ''} ${opp.location || ''}`.toLowerCase();
+        return text.includes('remote');
+      });
+    } else if (workModeFilter === 'HYBRID') {
+      list = list.filter((opp) => {
+        const text = `${opp.title || ''} ${opp.workMode || ''} ${opp.location || ''}`.toLowerCase();
+        return text.includes('hybrid');
+      });
+    } else if (workModeFilter === 'ON_SITE') {
+      list = list.filter((opp) => {
+        const text = `${opp.title || ''} ${opp.workMode || ''} ${opp.location || ''}`.toLowerCase();
+        return !text.includes('remote') && !text.includes('hybrid');
+      });
+    }
+
+    // 4. Match Score Filter (90%+, 80%+, 70%+)
+    if (matchScoreFilter === '90') {
+      list = list.filter((opp) => (opp.matchScore ?? 0) >= 90);
+    } else if (matchScoreFilter === '80') {
+      list = list.filter((opp) => (opp.matchScore ?? 0) >= 80);
+    } else if (matchScoreFilter === '70') {
+      list = list.filter((opp) => (opp.matchScore ?? 0) >= 70);
+    }
+
+    // 5. Sorting (Best Match, Recently Found)
+    if (sortBy === 'best_match') {
       list.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
-    } else if (sortBy === 'matchScore_asc') {
-      list.sort((a, b) => (a.matchScore || 0) - (b.matchScore || 0));
-    } else if (sortBy === 'company') {
-      list.sort((a, b) => (a.company || '').localeCompare(b.company || ''));
+    } else if (sortBy === 'recently_found') {
+      list.sort((a, b) => (a._originalIndex ?? 0) - (b._originalIndex ?? 0));
     }
 
     return list;
-  }, [opportunities, selectedMatchFilter, searchFilterKeyword, sortBy]);
+  }, [opportunities, searchKeyword, typeFilter, workModeFilter, matchScoreFilter, sortBy]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950">
@@ -206,56 +252,26 @@ export default function OpportunitiesPage() {
           </div>
         )}
 
-        {/* Client-Side Quick Filter & Sort Controls (Only visible after searching with results) */}
+        {/* Client-Side Quick Filter & Sort Controls (Always available after searching with results) */}
         {!loading && hasSearched && opportunities.length > 0 && (
-          <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 sm:p-5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            {/* Search filter keyword */}
-            <div className="relative flex-1 max-w-sm">
-              <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Filter by title, company, skill..."
-                value={searchFilterKeyword}
-                onChange={(e) => setSearchFilterKeyword(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
-              />
-            </div>
-
-            {/* Match Strength Filter Pills */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              {['ALL', 'Strong Match', 'Good Match', 'Possible Match'].map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setSelectedMatchFilter(category)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                    selectedMatchFilter === category
-                      ? 'bg-emerald-400 text-slate-950'
-                      : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
-                  }`}
-                >
-                  {category === 'ALL' ? 'All Matches' : category}
-                </button>
-              ))}
-            </div>
-
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-2 shrink-0">
-              <ArrowUpDown className="w-4 h-4 text-slate-500" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 focus:outline-none focus:border-emerald-500 transition-colors"
-              >
-                <option value="matchScore_desc">Highest Match First</option>
-                <option value="matchScore_asc">Lowest Match First</option>
-                <option value="company">Company Name (A-Z)</option>
-              </select>
-            </div>
-          </div>
+          <OpportunityFilters
+            searchKeyword={searchKeyword}
+            onSearchChange={setSearchKeyword}
+            typeFilter={typeFilter}
+            onTypeFilterChange={setTypeFilter}
+            workModeFilter={workModeFilter}
+            onWorkModeFilterChange={setWorkModeFilter}
+            matchScoreFilter={matchScoreFilter}
+            onMatchScoreFilterChange={setMatchScoreFilter}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
+            onResetFilters={handleResetFilters}
+            totalCount={opportunities.length}
+            filteredCount={filteredOpportunities.length}
+          />
         )}
 
-        {/* Section: Dynamic States */}
+        {/* Dynamic States */}
 
         {/* 1. Searching Skeleton State */}
         {loading && <OpportunitySkeleton count={4} />}
@@ -278,7 +294,7 @@ export default function OpportunitiesPage() {
           />
         )}
 
-        {/* 4. Results List */}
+        {/* 4. Results List (when matches exist) */}
         {!loading && hasSearched && !error && filteredOpportunities.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center justify-between text-xs text-slate-400 px-1">
@@ -286,14 +302,14 @@ export default function OpportunitiesPage() {
                 Showing {filteredOpportunities.length} of {opportunities.length} live opportunities
               </span>
               <span className="text-[11px] text-slate-500">
-                Sorted by AI Match Score
+                {sortBy === 'best_match' ? 'Sorted by Best Match' : 'Sorted by Recently Found'}
               </span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {filteredOpportunities.map((opp, idx) => (
                 <OpportunityCard
-                  key={`${opp.url}-${idx}`}
+                  key={`${opp.url}-${opp._originalIndex ?? idx}`}
                   opportunity={opp}
                 />
               ))}
@@ -301,8 +317,33 @@ export default function OpportunitiesPage() {
           </div>
         )}
 
-        {/* 5. No Results State (Search executed but 0 results returned or filters narrowed down to 0) */}
-        {!loading && hasSearched && !error && filteredOpportunities.length === 0 && (
+        {/* 5. Filtered Empty State (Search executed, raw results exist, but active filters filtered everything out) */}
+        {!loading && hasSearched && !error && opportunities.length > 0 && filteredOpportunities.length === 0 && (
+          <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-8 sm:p-12 text-center space-y-4 max-w-2xl mx-auto">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-400">
+              <Briefcase className="w-7 h-7" />
+            </div>
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-bold text-white">No Opportunities Match Your Filters</h3>
+              <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+                No opportunities in the retrieved list matched your search keywords or filter criteria. Try resetting or adjusting your filters.
+              </p>
+            </div>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset All Filters</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 6. Raw No Results State (Search executed and backend returned 0 opportunities) */}
+        {!loading && hasSearched && !error && opportunities.length === 0 && (
           <EmptyState
             type="no_results"
             onRetry={handleFindOpportunities}
