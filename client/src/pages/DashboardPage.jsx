@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import useAuth from '../hooks/useAuth.js';
 import ResumeUploader from '../components/ResumeUploader.jsx';
 import CandidateProfileView from '../components/CandidateProfileView.jsx';
+import OpportunityDiscovery from '../components/OpportunityDiscovery.jsx';
 import resumeService from '../services/resumeService.js';
 import {
   Compass,
@@ -280,27 +281,11 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Step 3: Live Opportunity Research Teaser */}
-            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-                    <Compass className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-white">Live Opportunity Discovery & Matching</h3>
-                    <p className="text-xs text-slate-400">Powered by Context.dev Web Research & Vertex AI</p>
-                  </div>
-                </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                  Phase 3 Next
-                </span>
-              </div>
-
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Live opportunity research will cross-reference your AI-assisted candidate profile against active placement opportunities on the web.
-              </p>
-            </div>
+            {/* Live Opportunity Research & Discovery */}
+            <OpportunityDiscovery
+              candidateProfile={candidateProfile}
+              userPreferences={user}
+            />
 
           </div>
 

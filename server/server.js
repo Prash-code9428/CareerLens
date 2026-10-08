@@ -6,6 +6,7 @@ import healthRoutes from './routes/healthRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
+import opportunityRoutes from './routes/opportunityRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // Load environment variables
@@ -31,6 +32,7 @@ app.use('/api', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/resume', resumeRoutes);
+app.use('/api/opportunities', opportunityRoutes);
 
 // Root fallback route
 app.get('/', (req, res) => {

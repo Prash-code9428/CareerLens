@@ -8,6 +8,11 @@ import { checkVertexAIHealth } from './services/vertexAI.js';
 import { validateSupabaseConfig, SUPABASE_BUCKET } from './config/supabase.js';
 import { cleanExtractedText, extractTextFromBuffer } from './services/resumeParser.js';
 import { normalizeCandidateProfile } from './services/resumeAnalyzer.js';
+import {
+  generateSearchQueries,
+  normalizeOpportunity,
+  deduplicateOpportunities
+} from './services/contextSearch.js';
 
 process.env.JWT_SECRET = 'test-secret-key-for-careerlens-2026';
 
@@ -202,10 +207,74 @@ startxref
   assert(normalizedProfile.experienceLevel === 'Student', 'Experience level normalized');
   assert(typeof normalizedProfile.analyzedAt === 'string', 'Timestamp attached to normalized profile');
 
+  // --- Context.dev & Vertex AI Opportunity Discovery Tests ---
+  // Test Search Query Generation
+  const testProfile = {
+    skills: ['React', 'Node.js', 'Express', 'MongoDB'],
+    programmingLanguages: ['JavaScript', 'TypeScript'],
+    preferredRoles: ['Full Stack Developer', 'Software Engineer Intern'],
+    experienceLevel: 'Student',
+    location: 'Bangalore',
+    workMode: 'Remote'
+  };
+
+  const generatedQueries = await generateSearchQueries(testProfile, {
+    preferredRoles: ['Full Stack Developer'],
+    location: 'Bangalore',
+    workMode: 'Remote'
+  });
+
+  assert(Array.isArray(generatedQueries), 'generateSearchQueries returns an array');
+  assert(generatedQueries.length >= 3 && generatedQueries.length <= 5, 'generateSearchQueries returns 3 to 5 focused queries');
+  assert(generatedQueries.some(q => q.toLowerCase().includes('bangalore') || q.toLowerCase().includes('stack') || q.toLowerCase().includes('intern')), 'Generated query incorporates candidate preferences');
+
+  // Test Normalization
+  const rawItem1 = {
+    title: 'Frontend Developer Intern',
+    company: 'TechCorp',
+    url: 'https://careers.techcorp.com/jobs/frontend-intern?source=linkedin&ref=123',
+    snippet: 'Looking for a React developer with modern web skills.',
+    location: 'Bangalore, India'
+  };
+
+  const normalized1 = normalizeOpportunity(rawItem1);
+  assert(normalized1.title === 'Frontend Developer Intern', 'normalizeOpportunity preserves title');
+  assert(normalized1.company === 'TechCorp', 'normalizeOpportunity preserves company');
+  assert(normalized1.url.startsWith('https://careers.techcorp.com'), 'normalizeOpportunity retains valid URL');
+  assert(normalized1.description === 'Looking for a React developer with modern web skills.', 'normalizeOpportunity maps snippet to description');
+  assert(normalized1.location === 'Bangalore, India', 'normalizeOpportunity maps location');
+  assert(normalized1.source === 'careers.techcorp.com', 'normalizeOpportunity extracts source domain from URL');
+
+  // Test Normalization with missing fields (must return null, not invented data)
+  const rawItemMissing = {
+    title: 'Backend Engineer',
+    url: 'https://hiring.xyz.com/job/456'
+  };
+  const normalizedMissing = normalizeOpportunity(rawItemMissing);
+  assert(normalizedMissing.description === null, 'Missing description defaults to null');
+  assert(normalizedMissing.location === null || typeof normalizedMissing.location === 'string', 'Location is string or null');
+
+  // Test Normalization discarding items without URL or title
+  assert(normalizeOpportunity({ title: 'No URL' }) === null, 'normalizeOpportunity discards items missing valid URL');
+  assert(normalizeOpportunity({ url: 'https://valid.url.com' }) === null, 'normalizeOpportunity discards items missing title');
+  assert(normalizeOpportunity(null) === null, 'normalizeOpportunity handles null input gracefully');
+
+  // Test Deduplication by URL
+  const duplicateList = [
+    { title: 'Job A', company: 'Corp 1', url: 'https://jobs.example.com/posting/100', description: 'Desc', location: 'Remote', source: 'example.com' },
+    { title: 'Job A (Duplicate)', company: 'Corp 1', url: 'https://jobs.example.com/posting/100?utm_source=feed', description: 'Desc 2', location: 'Remote', source: 'example.com' },
+    { title: 'Job B', company: 'Corp 2', url: 'https://jobs.example.com/posting/200/', description: 'Desc 3', location: 'Hybrid', source: 'example.com' },
+    { title: 'Job B (Duplicate)', company: 'Corp 2', url: 'https://jobs.example.com/posting/200', description: 'Desc 3', location: 'Hybrid', source: 'example.com' }
+  ];
+
+  const deduplicated = deduplicateOpportunities(duplicateList);
+  assert(deduplicated.length === 2, 'deduplicateOpportunities accurately deduplicates normalized URLs');
+  assert(deduplicated[0].title === 'Job A', 'deduplicateOpportunities preserves first occurrence');
+
   console.log(`\n📊 Test Results: ${passed}/${total} tests passed.`);
 
   if (passed === total) {
-    console.log('🎉 All Auth, Profile, Vertex AI, Supabase Storage, Parser & AI Intelligence checks passed cleanly!\n');
+    console.log('🎉 All Auth, Profile, Vertex AI, Supabase Storage, Parser & Context.dev Opportunity Discovery checks passed cleanly!\n');
   } else {
     process.exit(1);
   }
