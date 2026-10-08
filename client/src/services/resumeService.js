@@ -26,6 +26,22 @@ export const resumeService = {
   },
 
   /**
+   * Extract raw text from uploaded resume PDF
+   */
+  async extractResumeText() {
+    const response = await api.post('/resume/extract');
+    return response.data;
+  },
+
+  /**
+   * Analyze resume using Google Cloud Vertex AI and generate structured candidate profile
+   */
+  async analyzeResume() {
+    const response = await api.post('/resume/analyze');
+    return response.data;
+  },
+
+  /**
    * Fetch current resume status
    */
   async getResumeStatus() {

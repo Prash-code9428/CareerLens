@@ -7,11 +7,12 @@ import { validateGoogleCloudConfig } from './config/googleCloud.js';
 import { checkVertexAIHealth } from './services/vertexAI.js';
 import { validateSupabaseConfig, SUPABASE_BUCKET } from './config/supabase.js';
 import { cleanExtractedText, extractTextFromBuffer } from './services/resumeParser.js';
+import { normalizeCandidateProfile } from './services/resumeAnalyzer.js';
 
 process.env.JWT_SECRET = 'test-secret-key-for-careerlens-2026';
 
 async function runVerificationTests() {
-  console.log('🧪 Starting CareerLens Verification Tests (Auth, Profile, Vertex AI, Supabase & PDF Parser)...\n');
+  console.log('🧪 Starting CareerLens Verification Tests (Auth, Profile, Vertex AI, Supabase, Parser & AI Intelligence)...\n');
 
   let passed = 0;
   let total = 0;
@@ -118,12 +119,12 @@ async function runVerificationTests() {
   assert(mockUserDoc.resumePath === 'resumes/65b1234567890abcdef12345/resume.pdf', 'Resume storage path correctly formats to resumes/{userId}/resume.pdf');
 
   // --- Resume Parser & Extraction Tests ---
-  // Test 6: Text cleaning
+  // Text cleaning
   const dirtyText = "  Software Engineer   \n\n\n\nReact, Node.js, MongoDB \t\t  ";
   const cleaned = cleanExtractedText(dirtyText);
   assert(cleaned === "Software Engineer\n\nReact, Node.js, MongoDB", 'cleanExtractedText normalizes excessive whitespace and newlines');
 
-  // Test 7: Reject non-PDF or corrupted buffer
+  // Reject non-PDF or corrupted buffer
   let corruptedRejected = false;
   try {
     await extractTextFromBuffer(Buffer.from('Not a PDF at all'));
@@ -132,7 +133,7 @@ async function runVerificationTests() {
   }
   assert(corruptedRejected, 'extractTextFromBuffer rejects non-PDF buffer header');
 
-  // Test 8: Valid minimal PDF extraction
+  // Valid minimal PDF extraction
   const validPdfRaw = `%PDF-1.4
 1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj
 2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj
@@ -164,10 +165,47 @@ startxref
   assert(extraction.charCount > 20, 'extractTextFromBuffer extracts text from valid PDF');
   assert(extraction.text.includes('Full Stack Developer'), 'Extracted text content matches resume text');
 
+  // --- Vertex AI Candidate Profile Normalization Tests ---
+  const mockAiOutput = {
+    summary: 'Aspiring Full Stack Engineer with project experience in React and Node.js.',
+    skills: ['JavaScript', 'React', 'Node.js', 'Express', 'MongoDB'],
+    programmingLanguages: ['JavaScript', 'Python'],
+    frameworks: ['React', 'Express.js'],
+    databases: ['MongoDB', 'Supabase'],
+    tools: ['Git', 'Docker', 'Postman'],
+    projects: [
+      {
+        name: 'CareerLens',
+        description: 'AI-powered job discovery platform',
+        technologies: ['React', 'Node.js', 'Vertex AI']
+      }
+    ],
+    experience: [],
+    education: [
+      {
+        institution: 'Indian Institute of Technology',
+        degree: 'B.Tech',
+        major: 'Computer Science',
+        graduationYear: '2026'
+      }
+    ],
+    certifications: ['Google Cloud Certified Associate'],
+    preferredRoles: ['Software Engineer Intern', 'Frontend Developer'],
+    experienceLevel: 'Student'
+  };
+
+  const normalizedProfile = normalizeCandidateProfile(mockAiOutput);
+  assert(normalizedProfile.summary.length > 10, 'Candidate summary normalized');
+  assert(normalizedProfile.skills.length === 5, 'Skills array normalized');
+  assert(normalizedProfile.programmingLanguages.includes('JavaScript'), 'Programming languages preserved');
+  assert(normalizedProfile.projects[0].name === 'CareerLens', 'Projects mapped correctly');
+  assert(normalizedProfile.experienceLevel === 'Student', 'Experience level normalized');
+  assert(typeof normalizedProfile.analyzedAt === 'string', 'Timestamp attached to normalized profile');
+
   console.log(`\n📊 Test Results: ${passed}/${total} tests passed.`);
 
   if (passed === total) {
-    console.log('🎉 All Auth, Profile, Vertex AI, Supabase Storage & PDF Parser checks passed cleanly!\n');
+    console.log('🎉 All Auth, Profile, Vertex AI, Supabase Storage, Parser & AI Intelligence checks passed cleanly!\n');
   } else {
     process.exit(1);
   }

@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import { getSupabaseClient, validateSupabaseConfig, SUPABASE_BUCKET } from '../config/supabase.js';
 import { downloadResumeBuffer, extractTextFromBuffer } from '../services/resumeParser.js';
+import { analyzeResumeWithVertexAI } from '../services/resumeAnalyzer.js';
 
 /**
  * @desc    Upload or replace resume PDF in Supabase Storage
@@ -135,6 +136,99 @@ export const extractResumeText = async (req, res, next) => {
 };
 
 /**
+ * @desc    Analyze uploaded resume using Google Cloud Vertex AI to generate structured candidate profile
+ * @route   POST /api/resume/analyze
+ * @access  Private (JWT Protected)
+ */
+export const analyzeResume = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user || !user.resumePath) {
+      return res.status(400).json({
+        success: false,
+        message: 'No resume found. Please upload your resume PDF before running AI analysis.'
+      });
+    }
+
+    // 1. Download resume buffer from Supabase Storage
+    let pdfBuffer;
+    try {
+      pdfBuffer = await downloadResumeBuffer(user.resumePath);
+    } catch (storageErr) {
+      return res.status(404).json({
+        success: false,
+        message: `Unable to access resume document in storage: ${storageErr.message}`
+      });
+    }
+
+    // 2. Extract text from PDF buffer
+    let extractionResult;
+    try {
+      extractionResult = await extractTextFromBuffer(pdfBuffer);
+    } catch (extractErr) {
+      if (extractErr.code === 'NO_TEXT_FOUND') {
+        return res.status(422).json({
+          success: false,
+          code: 'IMAGE_ONLY_PDF',
+          message: extractErr.message
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        message: `Unable to extract readable text from resume: ${extractErr.message}`
+      });
+    }
+
+    // 3. Analyze extracted text with Google Cloud Vertex AI
+    try {
+      const candidateProfile = await analyzeResumeWithVertexAI(extractionResult.text);
+
+      // 4. Update user candidate profile in MongoDB
+      user.candidateProfile = candidateProfile;
+
+      // Populate user preferences if initially blank
+      if (!user.preferredRoles || user.preferredRoles.length === 0) {
+        if (candidateProfile.preferredRoles && candidateProfile.preferredRoles.length > 0) {
+          user.preferredRoles = candidateProfile.preferredRoles;
+        }
+      }
+
+      if (!user.education?.degree && candidateProfile.education && candidateProfile.education.length > 0) {
+        const primaryEdu = candidateProfile.education[0];
+        user.education = {
+          university: primaryEdu.institution || '',
+          degree: primaryEdu.degree || '',
+          major: primaryEdu.major || '',
+          graduationYear: primaryEdu.graduationYear || ''
+        };
+      }
+
+      if (candidateProfile.experienceLevel) {
+        user.experienceLevel = candidateProfile.experienceLevel;
+      }
+
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        message: 'Resume analyzed successfully with Google Cloud Vertex AI',
+        candidateProfile: user.candidateProfile,
+        user: user.toSafeObject()
+      });
+    } catch (aiErr) {
+      console.error('Vertex AI Resume Analysis Error:', aiErr.message);
+      return res.status(500).json({
+        success: false,
+        message: `AI analysis error: ${aiErr.message}`
+      });
+    }
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
  * @desc    Get current user resume status
  * @route   GET /api/resume/status
  * @access  Private (JWT Protected)
@@ -146,7 +240,8 @@ export const getResumeStatus = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       hasResume: !!user?.resumePath,
-      resumePath: user?.resumePath || null
+      resumePath: user?.resumePath || null,
+      hasCandidateProfile: !!user?.candidateProfile
     });
   } catch (error) {
     return next(error);
