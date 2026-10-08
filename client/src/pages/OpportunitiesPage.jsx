@@ -7,6 +7,7 @@ import OpportunitySkeleton from '../components/opportunities/OpportunitySkeleton
 import EmptyState from '../components/opportunities/EmptyState.jsx';
 import SearchButton from '../components/opportunities/SearchButton.jsx';
 import OpportunityFilters from '../components/opportunities/OpportunityFilters.jsx';
+import FeatureSearchBar from '../components/opportunities/FeatureSearchBar.jsx';
 import {
   Compass,
   Sparkles,
@@ -38,12 +39,16 @@ export default function OpportunitiesPage() {
     navigate('/login');
   };
 
-  const handleFindOpportunities = async () => {
+  const handleFindOpportunities = async (customPayload) => {
     setLoading(true);
     setError('');
 
+    // Ensure customPayload is a clean object, not a React SyntheticEvent or DOM Event
+    const isEvent = customPayload && (customPayload.nativeEvent || customPayload.target || customPayload._reactName || typeof customPayload.preventDefault === 'function');
+    const safePayload = (customPayload && typeof customPayload === 'object' && !isEvent) ? customPayload : {};
+
     try {
-      const response = await opportunityService.searchOpportunities();
+      const response = await opportunityService.searchOpportunities(safePayload);
       if (response.success) {
         setQueries(response.queries || []);
         // Attach original index for stable "Recently Found" sorting
@@ -108,12 +113,12 @@ export default function OpportunitiesPage() {
     if (typeFilter === 'INTERNSHIP') {
       list = list.filter((opp) => {
         const text = `${opp.title || ''} ${opp.jobType || ''}`.toLowerCase();
-        return text.includes('intern') || text.includes('internship') || text.includes('trainee');
+        return opp.jobType === 'Internship' || text.includes('intern') || text.includes('internship') || text.includes('trainee') || text.includes('co-op');
       });
     } else if (typeFilter === 'JOB') {
       list = list.filter((opp) => {
         const text = `${opp.title || ''} ${opp.jobType || ''}`.toLowerCase();
-        return !text.includes('intern') && !text.includes('internship');
+        return opp.jobType === 'Full-time' || opp.jobType === 'Part-time' || (!text.includes('intern') && !text.includes('internship'));
       });
     }
 
@@ -121,17 +126,17 @@ export default function OpportunitiesPage() {
     if (workModeFilter === 'REMOTE') {
       list = list.filter((opp) => {
         const text = `${opp.title || ''} ${opp.workMode || ''} ${opp.location || ''}`.toLowerCase();
-        return text.includes('remote');
+        return opp.workMode === 'Remote' || text.includes('remote');
       });
     } else if (workModeFilter === 'HYBRID') {
       list = list.filter((opp) => {
         const text = `${opp.title || ''} ${opp.workMode || ''} ${opp.location || ''}`.toLowerCase();
-        return text.includes('hybrid');
+        return opp.workMode === 'Hybrid' || text.includes('hybrid');
       });
     } else if (workModeFilter === 'ON_SITE') {
       list = list.filter((opp) => {
         const text = `${opp.title || ''} ${opp.workMode || ''} ${opp.location || ''}`.toLowerCase();
-        return !text.includes('remote') && !text.includes('hybrid');
+        return opp.workMode === 'On-site' || (!text.includes('remote') && !text.includes('hybrid'));
       });
     }
 
@@ -220,7 +225,7 @@ export default function OpportunitiesPage() {
 
           <div className="relative z-10 shrink-0">
             <SearchButton
-              onClick={handleFindOpportunities}
+              onClick={() => handleFindOpportunities()}
               loading={loading}
               hasSearched={hasSearched}
               disabled={!hasProfileContext}
@@ -230,6 +235,13 @@ export default function OpportunitiesPage() {
           {/* Subtle background glow */}
           <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
         </div>
+
+        {/* Feature-Based Search Bar */}
+        <FeatureSearchBar
+          user={user}
+          onSearch={(payload) => handleFindOpportunities(payload)}
+          loading={loading}
+        />
 
         {/* AI Query Indicator Pills */}
         {queries.length > 0 && (
@@ -281,7 +293,7 @@ export default function OpportunitiesPage() {
           <EmptyState
             type="error"
             errorMessage={error}
-            onRetry={handleFindOpportunities}
+            onRetry={() => handleFindOpportunities()}
           />
         )}
 
@@ -290,7 +302,7 @@ export default function OpportunitiesPage() {
           <EmptyState
             type="before_search"
             hasProfile={hasProfileContext}
-            onRetry={handleFindOpportunities}
+            onRetry={() => handleFindOpportunities()}
           />
         )}
 
@@ -346,7 +358,7 @@ export default function OpportunitiesPage() {
         {!loading && hasSearched && !error && opportunities.length === 0 && (
           <EmptyState
             type="no_results"
-            onRetry={handleFindOpportunities}
+            onRetry={() => handleFindOpportunities()}
           />
         )}
       </main>
