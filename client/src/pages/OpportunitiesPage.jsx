@@ -160,18 +160,18 @@ export default function OpportunitiesPage() {
   }, [opportunities, searchKeyword, typeFilter, workModeFilter, matchScoreFilter, sortBy]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+    <div className="min-h-screen bg-[#fafaf9] text-slate-900 flex flex-col selection:bg-emerald-200 selection:text-emerald-950">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-slate-950/80 border-b border-slate-800">
+      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 border-b border-stone-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link to="/dashboard" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
                 <Compass className="w-5 h-5" />
               </div>
-              <span className="font-bold text-lg text-white">CareerLens</span>
+              <span className="font-bold text-lg text-slate-900">CareerLens</span>
             </Link>
-            <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-800">
               Live Opportunities
             </span>
           </div>
@@ -179,25 +179,25 @@ export default function OpportunitiesPage() {
           <div className="flex items-center gap-3 sm:gap-4">
             <Link
               to="/dashboard"
-              className="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 transition-colors"
+              className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-stone-300 transition-colors shadow-sm"
             >
               Dashboard
             </Link>
             <Link
               to="/profile"
-              className="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 transition-colors"
+              className="text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-stone-300 transition-colors shadow-sm"
             >
               Profile
             </Link>
 
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold text-white leading-tight">{user?.name}</p>
-              <p className="text-xs text-slate-400">{user?.email}</p>
+              <p className="text-sm font-semibold text-slate-900 leading-tight">{user?.name}</p>
+              <p className="text-xs text-slate-500">{user?.email}</p>
             </div>
 
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/10 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-stone-200 text-xs font-semibold text-slate-600 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-colors shadow-sm cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Logout</span>
@@ -209,16 +209,16 @@ export default function OpportunitiesPage() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Page Hero Header */}
-        <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-900/80 border border-slate-800 p-6 sm:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+        <div className="rounded-3xl bg-white border border-stone-200/90 shadow-sm p-6 sm:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
           <div className="space-y-2.5 max-w-2xl relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
               <span>Real-Time Web Intelligence & Vertex AI Matching</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               Opportunities matched to you
             </h1>
-            <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               Based on your skills, preferences and resume.
             </p>
           </div>
@@ -245,18 +245,18 @@ export default function OpportunitiesPage() {
 
         {/* AI Query Indicator Pills */}
         {queries.length > 0 && (
-          <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-2.5">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
+          <div className="p-4 rounded-2xl bg-white border border-stone-200/90 shadow-sm space-y-2.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
+              <Sparkles className="w-4 h-4 text-emerald-600" />
               <span>Google Cloud Vertex AI generated focused searches:</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {queries.map((q, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 text-xs font-mono"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-stone-50 border border-stone-200 text-slate-800 text-xs font-mono"
                 >
-                  <Tag className="w-3 h-3 text-emerald-400/70" />
+                  <Tag className="w-3 h-3 text-emerald-600" />
                   "{q}"
                 </span>
               ))}
@@ -309,7 +309,7 @@ export default function OpportunitiesPage() {
         {/* 4. Results List (when matches exist) */}
         {!loading && hasSearched && !error && filteredOpportunities.length > 0 && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+            <div className="flex items-center justify-between text-xs text-slate-600 px-1">
               <span>
                 Showing {filteredOpportunities.length} of {opportunities.length} live opportunities
               </span>
@@ -331,13 +331,13 @@ export default function OpportunitiesPage() {
 
         {/* 5. Filtered Empty State (Search executed, raw results exist, but active filters filtered everything out) */}
         {!loading && hasSearched && !error && opportunities.length > 0 && filteredOpportunities.length === 0 && (
-          <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-8 sm:p-12 text-center space-y-4 max-w-2xl mx-auto">
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-400">
+          <div className="rounded-2xl bg-white border border-stone-200/90 shadow-sm p-8 sm:p-12 text-center space-y-4 max-w-2xl mx-auto">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center text-slate-600">
               <Briefcase className="w-7 h-7" />
             </div>
             <div className="space-y-1.5">
-              <h3 className="text-lg font-bold text-white">No Opportunities Match Your Filters</h3>
-              <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+              <h3 className="text-lg font-bold text-slate-900">No Opportunities Match Your Filters</h3>
+              <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
                 No opportunities in the retrieved list matched your search keywords or filter criteria. Try resetting or adjusting your filters.
               </p>
             </div>
@@ -345,7 +345,7 @@ export default function OpportunitiesPage() {
               <button
                 type="button"
                 onClick={handleResetFilters}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-800 hover:bg-emerald-100 transition-colors cursor-pointer shadow-sm"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset All Filters</span>

@@ -22,15 +22,15 @@ export default function Input({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-xs font-semibold text-slate-300"
+          className="block text-xs font-semibold text-slate-700"
         >
-          {label} {required && <span className="text-rose-400">*</span>}
+          {label} {required && <span className="text-rose-500">*</span>}
         </label>
       )}
 
-      <div className="relative rounded-xl shadow-sm">
+      <div className="relative rounded-xl shadow-2xs">
         {Icon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
             <Icon className="w-4 h-4" />
           </div>
         )}
@@ -47,22 +47,22 @@ export default function Input({
           disabled={disabled}
           aria-invalid={!!error}
           aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
-          className={`w-full rounded-xl bg-slate-900 border px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:outline-none focus:ring-2 disabled:bg-slate-900/50 disabled:cursor-not-allowed ${
+          className={`w-full rounded-xl bg-white border px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 disabled:bg-stone-100 disabled:text-slate-400 disabled:cursor-not-allowed ${
             Icon ? 'pl-9' : ''
           } ${
             error
-              ? 'border-rose-500/60 focus:border-rose-500 focus:ring-rose-500/20'
-              : 'border-slate-800 hover:border-slate-700 focus:border-emerald-500 focus:ring-emerald-500/20'
+              ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/20'
+              : 'border-stone-300 hover:border-stone-400 focus:border-emerald-600 focus:ring-emerald-500/20'
           }`}
         />
       </div>
 
       {error ? (
-        <p id={`${inputId}-error`} className="text-xs text-rose-400">
+        <p id={`${inputId}-error`} className="text-xs text-rose-600 font-medium">
           {error}
         </p>
       ) : helperText ? (
-        <p id={`${inputId}-helper`} className="text-xs text-slate-400">
+        <p id={`${inputId}-helper`} className="text-xs text-slate-500">
           {helperText}
         </p>
       ) : null}

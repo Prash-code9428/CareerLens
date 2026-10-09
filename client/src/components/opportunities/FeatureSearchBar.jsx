@@ -75,17 +75,17 @@ export default function FeatureSearchBar({
   };
 
   return (
-    <div className="rounded-3xl bg-slate-900 border border-slate-800 p-5 sm:p-7 shadow-xl shadow-slate-950/60 space-y-5">
+    <div className="rounded-3xl bg-white border border-stone-200/90 p-5 sm:p-7 shadow-sm space-y-5">
       {/* Mode Selector Tabs */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
-        <div className="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-stone-100">
+        <div className="flex items-center gap-2 bg-[#fafaf9] p-1 rounded-xl border border-stone-200/80">
           <button
             type="button"
             onClick={() => setActiveTab('resume')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               activeTab === 'resume'
-                ? 'bg-emerald-400 text-slate-950 shadow-md shadow-emerald-500/10'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-emerald-600 text-white shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -96,8 +96,8 @@ export default function FeatureSearchBar({
             onClick={() => setActiveTab('custom')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               activeTab === 'custom'
-                ? 'bg-emerald-400 text-slate-950 shadow-md shadow-emerald-500/10'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-emerald-600 text-white shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -105,7 +105,7 @@ export default function FeatureSearchBar({
           </button>
         </div>
 
-        <div className="text-xs text-slate-400">
+        <div className="text-xs text-slate-500">
           {activeTab === 'resume' ? (
             <span>Automatically searching using skills extracted from your resume</span>
           ) : (
@@ -117,14 +117,14 @@ export default function FeatureSearchBar({
       {/* Mode 1: AI Resume Match View */}
       {activeTab === 'resume' && (
         <div className="space-y-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-2xl bg-slate-950/70 border border-slate-800">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-5 rounded-2xl bg-[#fafaf9] border border-stone-200/80">
             <div className="space-y-1">
-              <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                <Briefcase className="w-4 h-4 text-emerald-400" />
+              <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-emerald-600" />
                 Targeting: {user?.preferredRoles?.join(', ') || 'Software Engineer Intern'}
               </h4>
-              <p className="text-xs text-slate-400">
-                Location: <strong className="text-slate-300">{user?.location || 'India'}</strong> • Work Mode: <strong className="text-slate-300">{user?.workMode || 'Any'}</strong> • Level: <strong className="text-slate-300">{user?.experienceLevel || 'Student'}</strong>
+              <p className="text-xs text-slate-600">
+                Location: <strong className="text-slate-800">{user?.location || 'India'}</strong> • Work Mode: <strong className="text-slate-800">{user?.workMode || 'Any'}</strong> • Level: <strong className="text-slate-800">{user?.experienceLevel || 'Student'}</strong>
               </p>
             </div>
 
@@ -132,7 +132,7 @@ export default function FeatureSearchBar({
               type="button"
               onClick={handleExecuteSearch}
               disabled={loading}
-              className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs bg-emerald-400 text-slate-950 hover:bg-emerald-300 active:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/10 cursor-pointer disabled:opacity-50"
+              className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 transition-colors shadow-sm shadow-emerald-700/15 cursor-pointer disabled:opacity-50"
             >
               <Sparkles className="w-4 h-4" />
               <span>{loading ? 'Finding Best Matches...' : 'Find Matches From Resume'}</span>
@@ -146,7 +146,7 @@ export default function FeatureSearchBar({
               {parsedSkills.slice(0, 8).map((skill, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 text-slate-300 text-[11px]"
+                  className="px-2.5 py-0.5 rounded-md bg-stone-100 border border-stone-200 text-slate-700 text-[11px]"
                 >
                   {skill}
                 </span>
@@ -162,13 +162,13 @@ export default function FeatureSearchBar({
           {/* Main Keyword / Role Search Bar */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
             <div className="relative md:col-span-8">
-              <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search specific roles or keywords (e.g. AI Engineer Intern, Full Stack Developer, Python Data Analyst)..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                className="w-full bg-[#fafaf9] border border-stone-200/90 rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
               />
             </div>
 
@@ -176,7 +176,7 @@ export default function FeatureSearchBar({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-xs sm:text-sm bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 text-slate-950 hover:from-emerald-300 hover:to-cyan-300 transition-all shadow-lg shadow-emerald-500/20 cursor-pointer disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-bold text-xs sm:text-sm bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 transition-all shadow-md shadow-emerald-700/15 cursor-pointer disabled:opacity-50"
               >
                 <Search className="w-4 h-4" />
                 <span>{loading ? 'Searching...' : 'Search Live Jobs'}</span>
@@ -185,12 +185,12 @@ export default function FeatureSearchBar({
           </div>
 
           {/* Quick Expandable Criteria */}
-          <div className="pt-2 border-t border-slate-800/80 space-y-3">
+          <div className="pt-3 border-t border-stone-100 space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* Location */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-slate-500" />
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-slate-400" />
                   Target Location
                 </label>
                 <input
@@ -198,20 +198,20 @@ export default function FeatureSearchBar({
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="e.g. India, Bengaluru, Remote, USA"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#fafaf9] border border-stone-200/90 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:bg-white"
                 />
               </div>
 
               {/* Work Mode */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                  <Laptop className="w-3 h-3 text-slate-500" />
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                  <Laptop className="w-3 h-3 text-slate-400" />
                   Work Mode
                 </label>
                 <select
                   value={workMode}
                   onChange={(e) => setWorkMode(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full bg-[#fafaf9] border border-stone-200/90 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
                 >
                   <option value="Any">Any Work Mode</option>
                   <option value="Remote">Remote Only</option>
@@ -222,14 +222,14 @@ export default function FeatureSearchBar({
 
               {/* Experience Level */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                  <GraduationCap className="w-3 h-3 text-slate-500" />
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3 text-slate-400" />
                   Experience Level
                 </label>
                 <select
                   value={experienceLevel}
                   onChange={(e) => setExperienceLevel(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full bg-[#fafaf9] border border-stone-200/90 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-600 focus:bg-white cursor-pointer"
                 >
                   <option value="Student">Student / Internship</option>
                   <option value="Fresher">Fresher (New Grad)</option>
@@ -241,9 +241,9 @@ export default function FeatureSearchBar({
 
             {/* Target Skills Tags */}
             <div className="space-y-2 pt-2">
-              <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 <span>Target Skill Filters ({selectedSkills.length})</span>
-                <span className="text-[10px] text-slate-500 normal-case">Add skills you want the jobs to match</span>
+                <span className="text-[10px] text-slate-400 normal-case">Add skills you want the jobs to match</span>
               </div>
 
               {/* Skill chips */}
@@ -251,13 +251,13 @@ export default function FeatureSearchBar({
                 {selectedSkills.map((skill, idx) => (
                   <span
                     key={idx}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium"
                   >
                     {skill}
                     <button
                       type="button"
                       onClick={() => handleRemoveSkill(skill)}
-                      className="text-emerald-400/60 hover:text-emerald-300 p-0.5"
+                      className="text-emerald-600 hover:text-emerald-800 p-0.5"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -277,13 +277,13 @@ export default function FeatureSearchBar({
                       }
                     }}
                     placeholder="+ Add skill..."
-                    className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-28"
+                    className="bg-[#fafaf9] border border-stone-200/90 rounded-lg px-2.5 py-1 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:bg-white w-28"
                   />
                   {customSkillInput.trim() && (
                     <button
                       type="button"
                       onClick={() => handleAddSkill(customSkillInput)}
-                      className="px-2 py-1 bg-slate-800 text-slate-200 rounded-lg text-xs hover:bg-slate-700"
+                      className="px-2 py-1 bg-stone-100 hover:bg-stone-200 text-slate-700 rounded-lg text-xs"
                     >
                       <Plus className="w-3 h-3" />
                     </button>

@@ -151,20 +151,20 @@ export default function ResumeUploader({ onUploadSuccess }) {
 
       {/* Existing Resume Active State Banner */}
       {hasExistingResume && !uploading && (
-        <div className="p-4 rounded-xl bg-slate-900 border border-emerald-500/30 flex items-center justify-between gap-4">
+        <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="w-10 h-10 rounded-lg bg-white border border-emerald-200 flex items-center justify-center text-emerald-700 shadow-2xs">
               <FileText className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-sm font-bold text-white">Active Resume PDF</p>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <p className="text-sm font-bold text-slate-900">Active Resume PDF</p>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300/80">
                   <ShieldCheck className="w-3 h-3" />
                   Stored in Supabase
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-mono mt-0.5 truncate max-w-xs sm:max-w-md">
+              <p className="text-xs text-slate-500 font-mono mt-0.5 truncate max-w-xs sm:max-w-md">
                 {user.resumePath}
               </p>
             </div>
@@ -173,7 +173,7 @@ export default function ResumeUploader({ onUploadSuccess }) {
           <button
             type="button"
             onClick={handleBrowseClick}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors border border-slate-700 shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white hover:bg-stone-50 text-slate-700 text-xs font-semibold transition-colors border border-stone-200 hover:border-stone-300 shadow-2xs shrink-0 cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Replace PDF</span>
@@ -190,14 +190,14 @@ export default function ResumeUploader({ onUploadSuccess }) {
         onClick={!uploading ? handleBrowseClick : undefined}
         className={`relative rounded-2xl border-2 border-dashed p-8 text-center transition-all cursor-pointer ${
           dragActive
-            ? 'border-emerald-400 bg-emerald-500/10'
+            ? 'border-emerald-500 bg-emerald-50/50'
             : hasExistingResume
-            ? 'border-slate-800 hover:border-slate-700 bg-slate-950/60'
-            : 'border-slate-700 hover:border-emerald-500/60 bg-slate-900/50 hover:bg-slate-900'
+            ? 'border-stone-300 hover:border-emerald-400 bg-white'
+            : 'border-stone-300 hover:border-emerald-500 bg-white hover:bg-stone-50/60 shadow-2xs'
         } ${uploading ? 'cursor-not-allowed opacity-80' : ''}`}
       >
         <div className="flex flex-col items-center justify-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shadow-2xs">
             {uploading ? (
               <Loader2 className="w-7 h-7 animate-spin" />
             ) : (
@@ -206,14 +206,14 @@ export default function ResumeUploader({ onUploadSuccess }) {
           </div>
 
           <div>
-            <p className="text-sm font-bold text-white">
+            <p className="text-sm font-bold text-slate-900">
               {uploading
                 ? 'Uploading to Supabase Storage...'
                 : hasExistingResume
                 ? 'Drop a new PDF here to replace your resume'
                 : 'Click to upload or drag & drop your resume PDF'}
             </p>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               Supports standard PDF documents up to 5 MB
             </p>
           </div>
@@ -221,13 +221,13 @@ export default function ResumeUploader({ onUploadSuccess }) {
           {/* Upload Progress Bar */}
           {uploading && (
             <div className="w-full max-w-xs space-y-1.5 pt-2">
-              <div className="flex items-center justify-between text-xs font-mono text-slate-400">
+              <div className="flex items-center justify-between text-xs font-mono text-slate-500">
                 <span>Uploading...</span>
                 <span>{progress}%</span>
               </div>
-              <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
                 <div
-                  className="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full transition-all duration-300"
+                  className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -238,16 +238,16 @@ export default function ResumeUploader({ onUploadSuccess }) {
 
       {/* Selected file preview (before or during upload) */}
       {selectedFile && !uploading && (
-        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+        <div className="flex items-center justify-between p-3 rounded-xl bg-stone-50 border border-stone-200 text-xs">
           <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-emerald-400" />
-            <span className="text-slate-200 font-medium">{selectedFile.name}</span>
+            <FileText className="w-4 h-4 text-emerald-600" />
+            <span className="text-slate-800 font-medium">{selectedFile.name}</span>
             <span className="text-slate-500">({formatFileSize(selectedFile.size)})</span>
           </div>
           <button
             type="button"
             onClick={() => setSelectedFile(null)}
-            className="text-slate-400 hover:text-rose-400"
+            className="text-slate-400 hover:text-rose-600 cursor-pointer p-1"
           >
             <Trash2 className="w-4 h-4" />
           </button>

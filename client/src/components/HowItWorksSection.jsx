@@ -1,166 +1,104 @@
 import React from 'react';
-import { FileUp, Cpu, Globe, CheckSquare, ArrowDown, ArrowRight } from 'lucide-react';
+import { FileUp, UserCheck, Compass, CheckCircle2 } from 'lucide-react';
 
 const STEPS = [
   {
     number: '01',
-    title: 'Upload Resume',
-    subtitle: 'Secure Storage',
+    title: 'Upload Your Resume',
+    subtitle: 'Fast & Secure',
     description:
-      'Upload your PDF resume. It is securely stored in Supabase Storage and prepped for structured entity extraction.',
+      'Upload your resume and let CareerLens understand your experience, skills, projects, and interests.',
     icon: FileUp,
-    badge: 'Supabase Storage'
+    badge: 'Resume Analysis'
   },
   {
     number: '02',
-    title: 'Understand Your Skills',
-    subtitle: 'Vertex AI Intelligence',
+    title: 'Build Your Career Profile',
+    subtitle: 'Structured Understanding',
     description:
-      'Google Cloud Vertex AI parses your projects, technical skills, coursework, and experience into a high-precision candidate profile.',
-    icon: Cpu,
-    badge: 'Google Cloud Vertex AI'
+      'CareerLens turns your experience into a personalized profile of your strengths and career direction.',
+    icon: UserCheck,
+    badge: 'Career Profile'
   },
   {
     number: '03',
-    title: 'Research Opportunities',
-    subtitle: 'Live Web Research',
+    title: 'Discover Better-Fit Opportunities',
+    subtitle: 'Targeted Discovery',
     description:
-      'Personalized queries generated from your profile feed into Context.dev to discover verified, real-time job and internship postings.',
-    icon: Globe,
-    badge: 'Context.dev Web Research'
+      'Explore relevant jobs and internships based on your actual profile instead of manually searching through endless listings.',
+    icon: Compass,
+    badge: 'Live Opportunities'
   },
   {
     number: '04',
-    title: 'Match & Recommend',
-    subtitle: 'Actionable Insights',
+    title: 'Understand Before You Apply',
+    subtitle: 'Match & Gap Insights',
     description:
-      'Vertex AI compares live role requirements against your profile, delivering quantitative fit scores, matched skills, and gap analysis.',
-    icon: CheckSquare,
-    badge: 'Personalized Fit Analysis'
+      'See what matches, what skills you may be missing, and why an opportunity could be worth your attention.',
+    icon: CheckCircle2,
+    badge: 'Smart Compatibility'
   }
-];
-
-const FLOW_NODES = [
-  { label: 'Resume', sub: 'PDF document' },
-  { label: 'Vertex AI', sub: 'Profile Extraction' },
-  { label: 'Candidate Profile', sub: 'Structured schema' },
-  { label: 'Context.dev', sub: 'Live web intelligence' },
-  { label: 'Live Opportunities', sub: 'Current job listings' },
-  { label: 'Vertex AI', sub: 'Fit & Gap Analysis' },
-  { label: 'Personalized Matches', sub: 'Scores & recommendations' }
 ];
 
 export default function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-20 bg-slate-950">
+    <section id="how-it-works" className="py-20 md:py-28 bg-white border-b border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-16">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60">
             How It Works
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            From resume upload to verified match in 4 steps
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            From resume upload to matched opportunity in four steps
           </h2>
-          <p className="text-base sm:text-lg text-slate-400 leading-relaxed">
-            CareerLens combines Google Cloud Vertex AI and Context.dev to replace blind job hunting with evidence-backed matching.
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+            CareerLens replaces tedious, manual job hunting with an intelligent workflow designed to give you clarity and confidence.
           </p>
         </div>
 
         {/* 4 Steps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {STEPS.map((step) => {
             const Icon = step.icon;
             return (
               <div
                 key={step.number}
-                className="relative rounded-2xl bg-slate-900 border border-slate-800 p-6 flex flex-col justify-between hover:border-slate-700 transition-all group"
+                className="relative rounded-2xl bg-[#fafaf9] border border-stone-200/90 p-6 sm:p-7 flex flex-col justify-between hover:border-emerald-300 hover:shadow-md hover:shadow-stone-200/60 transition-all group"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-black text-emerald-400 tracking-tight font-mono">
+                    <span className="text-2xl font-black text-emerald-700 tracking-tight font-mono">
                       {step.number}
                     </span>
-                    <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-300 group-hover:text-emerald-400 group-hover:bg-slate-800/80 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-white border border-stone-200/80 flex items-center justify-center text-slate-700 group-hover:text-emerald-700 group-hover:border-emerald-200 transition-colors shadow-2xs">
                       <Icon className="w-5 h-5" />
                     </div>
                   </div>
 
-                  <div>
-                    <h3 className="text-lg font-bold text-white">
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-bold text-slate-900">
                       {step.title}
                     </h3>
-                    <p className="text-xs font-semibold text-emerald-400/90 mt-0.5">
+                    <p className="text-xs font-semibold text-emerald-700">
                       {step.subtitle}
                     </p>
                   </div>
 
-                  <p className="text-sm text-slate-400 leading-relaxed">
+                  <p className="text-sm text-slate-600 leading-relaxed">
                     {step.description}
                   </p>
                 </div>
 
-                <div className="pt-5 mt-4 border-t border-slate-800/80">
-                  <span className="inline-block text-[11px] font-medium text-slate-400 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800">
+                <div className="pt-5 mt-5 border-t border-stone-200/80">
+                  <span className="inline-block text-[11px] font-medium text-slate-600 bg-white px-2.5 py-1 rounded-md border border-stone-200 shadow-2xs">
                     {step.badge}
                   </span>
                 </div>
               </div>
             );
           })}
-        </div>
-
-        {/* Visual Architecture Flow Diagram */}
-        <div className="rounded-2xl bg-slate-900/80 border border-slate-800 p-6 sm:p-8">
-          <div className="text-center mb-8">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300">
-              System Matching Architecture
-            </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              End-to-end data pipeline powering candidate recommendations
-            </p>
-          </div>
-
-          {/* Desktop Flow (horizontal) */}
-          <div className="hidden lg:flex items-center justify-between gap-2 overflow-x-auto pb-2">
-            {FLOW_NODES.map((node, i) => (
-              <React.Fragment key={i}>
-                <div className="flex-1 min-w-[130px] rounded-xl bg-slate-950 border border-slate-800 p-3 text-center space-y-1">
-                  <div className="text-xs font-bold text-slate-200">
-                    {node.label}
-                  </div>
-                  <div className="text-[10px] text-emerald-400 font-medium truncate">
-                    {node.sub}
-                  </div>
-                </div>
-
-                {i < FLOW_NODES.length - 1 && (
-                  <ArrowRight className="w-4 h-4 text-slate-600 shrink-0" />
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-
-          {/* Mobile Flow (vertical) */}
-          <div className="flex lg:hidden flex-col items-center space-y-2">
-            {FLOW_NODES.map((node, i) => (
-              <React.Fragment key={i}>
-                <div className="w-full max-w-sm rounded-xl bg-slate-950 border border-slate-800 p-3 text-center space-y-0.5">
-                  <div className="text-sm font-bold text-slate-200">
-                    {node.label}
-                  </div>
-                  <div className="text-xs text-emerald-400 font-medium">
-                    {node.sub}
-                  </div>
-                </div>
-
-                {i < FLOW_NODES.length - 1 && (
-                  <ArrowDown className="w-4 h-4 text-slate-600 my-1" />
-                )}
-              </React.Fragment>
-            ))}
-          </div>
         </div>
 
       </div>

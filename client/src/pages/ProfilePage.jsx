@@ -222,14 +222,14 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+    <div className="min-h-screen bg-[#fafaf9] text-slate-900 flex flex-col selection:bg-emerald-200 selection:text-emerald-950">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-slate-950/80 border-b border-slate-800">
+      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/90 border-b border-stone-200/80">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg bg-white border border-stone-200 hover:border-stone-300 transition-colors shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Dashboard</span>
@@ -237,10 +237,10 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
               <Compass className="w-4 h-4" />
             </div>
-            <span className="font-bold text-sm text-white">CareerLens Profile</span>
+            <span className="font-bold text-sm text-slate-900">CareerLens Profile</span>
           </div>
         </div>
       </header>
@@ -255,34 +255,34 @@ export default function ProfilePage() {
         {/* Page Title & Profile Completion Card */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               Candidate Placement Profile
             </h1>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <p className="text-sm text-slate-600 leading-relaxed">
               Complete your educational background and career preferences to guide Vertex AI job matching and research.
             </p>
           </div>
 
           {/* Profile Completion Widget */}
-          <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-3">
+          <div className="rounded-2xl bg-white border border-stone-200/90 shadow-sm p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 Profile Completion
               </span>
-              <span className="text-sm font-bold text-emerald-400 font-mono">
+              <span className="text-sm font-bold text-emerald-700 font-mono">
                 {completionPercent}%
               </span>
             </div>
 
             {/* Progress bar */}
-            <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+            <div className="w-full bg-stone-100 rounded-full h-2 overflow-hidden border border-stone-200">
               <div
-                className="bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full transition-all duration-500"
+                className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${completionPercent}%` }}
               />
             </div>
 
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500">
               {completionPercent >= 80
                 ? 'Great job! Your profile is well-detailed for role discovery.'
                 : 'Fill in your education and target roles for optimal matching.'}
@@ -292,8 +292,8 @@ export default function ProfilePage() {
 
         {/* Success / Error Feedback */}
         {successMessage && (
-          <div className="flex items-center gap-2 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <div className="flex items-center gap-2 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm shadow-sm">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
             <span>{successMessage}</span>
           </div>
         )}
@@ -309,10 +309,10 @@ export default function ProfilePage() {
             <div className="lg:col-span-2 space-y-6">
               
               {/* Section 1: Basic Information */}
-              <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-5">
-                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-800">
-                  <User className="w-5 h-5 text-emerald-400" />
-                  <h2 className="text-base font-bold text-white">Basic Information</h2>
+              <div className="rounded-2xl bg-white border border-stone-200/90 shadow-sm p-6 space-y-5">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-stone-100">
+                  <User className="w-5 h-5 text-emerald-600" />
+                  <h2 className="text-base font-bold text-slate-900">Basic Information</h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -351,10 +351,10 @@ export default function ProfilePage() {
               </div>
 
               {/* Section 2: Education */}
-              <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-5">
-                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-800">
-                  <GraduationCap className="w-5 h-5 text-emerald-400" />
-                  <h2 className="text-base font-bold text-white">Education Details</h2>
+              <div className="rounded-2xl bg-white border border-stone-200/90 shadow-sm p-6 space-y-5">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-stone-100">
+                  <GraduationCap className="w-5 h-5 text-emerald-600" />
+                  <h2 className="text-base font-bold text-slate-900">Education Details</h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -399,15 +399,15 @@ export default function ProfilePage() {
               </div>
 
               {/* Section 3: Career Preferences */}
-              <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-6">
-                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-800">
-                  <Briefcase className="w-5 h-5 text-emerald-400" />
-                  <h2 className="text-base font-bold text-white">Career & Role Preferences</h2>
+              <div className="rounded-2xl bg-white border border-stone-200/90 shadow-sm p-6 space-y-6">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-stone-100">
+                  <Briefcase className="w-5 h-5 text-emerald-600" />
+                  <h2 className="text-base font-bold text-slate-900">Career & Role Preferences</h2>
                 </div>
 
                 {/* Work Mode Selection */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-slate-300">
+                  <label className="block text-xs font-semibold text-slate-700">
                     Work Mode Preference
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -419,10 +419,10 @@ export default function ProfilePage() {
                           setFormData((prev) => ({ ...prev, workMode: mode }));
                           setSuccessMessage('');
                         }}
-                        className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all text-center ${
+                        className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all text-center cursor-pointer ${
                           formData.workMode === mode
-                            ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/30'
-                            : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
+                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm ring-1 ring-emerald-600/30'
+                            : 'bg-white border-stone-200 text-slate-700 hover:border-stone-300 hover:bg-stone-50'
                         }`}
                       >
                         {mode}
@@ -433,7 +433,7 @@ export default function ProfilePage() {
 
                 {/* Experience Level Selection */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-slate-300">
+                  <label className="block text-xs font-semibold text-slate-700">
                     Experience Level
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -445,10 +445,10 @@ export default function ProfilePage() {
                           setFormData((prev) => ({ ...prev, experienceLevel: level }));
                           setSuccessMessage('');
                         }}
-                        className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all text-center ${
+                        className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all text-center cursor-pointer ${
                           formData.experienceLevel === level
-                            ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/30'
-                            : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
+                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm ring-1 ring-emerald-600/30'
+                            : 'bg-white border-stone-200 text-slate-700 hover:border-stone-300 hover:bg-stone-50'
                         }`}
                       >
                         {level}
@@ -459,7 +459,7 @@ export default function ProfilePage() {
 
                 {/* Preferred Roles Manager */}
                 <div className="space-y-3">
-                  <label className="block text-xs font-semibold text-slate-300">
+                  <label className="block text-xs font-semibold text-slate-700">
                     Preferred Target Roles (Multiple)
                   </label>
 
@@ -471,13 +471,13 @@ export default function ProfilePage() {
                       onChange={(e) => setNewRoleInput(e.target.value)}
                       onKeyDown={handleRoleKeyDown}
                       placeholder="Add a target role (e.g. Backend Engineer)"
-                      className="flex-1 rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30"
+                      className="flex-1 rounded-xl bg-white border border-stone-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600/30 shadow-sm"
                     />
                     <button
                       type="button"
                       onClick={() => addRole()}
                       disabled={!newRoleInput.trim()}
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-700"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white text-slate-700 hover:bg-stone-50 disabled:opacity-50 disabled:cursor-not-allowed border border-stone-300 shadow-sm cursor-pointer"
                     >
                       <Plus className="w-4 h-4" />
                       Add
@@ -487,20 +487,20 @@ export default function ProfilePage() {
                   {/* Active selected roles tags */}
                   <div className="flex flex-wrap gap-2 pt-1 min-h-[36px]">
                     {formData.preferredRoles.length === 0 ? (
-                      <p className="text-xs text-slate-500 italic">
+                      <p className="text-xs text-slate-400 italic">
                         No target roles added yet. Choose from suggestions below or type your own.
                       </p>
                     ) : (
                       formData.preferredRoles.map((role) => (
                         <span
                           key={role}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/10 border border-emerald-500/25 text-emerald-300"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-800"
                         >
                           {role}
                           <button
                             type="button"
                             onClick={() => removeRole(role)}
-                            className="hover:text-rose-400 transition-colors"
+                            className="hover:text-rose-600 transition-colors cursor-pointer"
                             aria-label={`Remove ${role}`}
                           >
                             <X className="w-3.5 h-3.5" />
@@ -523,13 +523,13 @@ export default function ProfilePage() {
                             key={role}
                             type="button"
                             onClick={() => (isSelected ? removeRole(role) : addRole(role))}
-                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium border transition-colors flex items-center gap-1 ${
+                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium border transition-colors flex items-center gap-1 cursor-pointer ${
                               isSelected
-                                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
-                                : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700'
+                                ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                                : 'bg-white border-stone-200 text-slate-600 hover:text-slate-900 hover:border-stone-300 shadow-sm'
                             }`}
                           >
-                            {isSelected && <Check className="w-3 h-3" />}
+                            {isSelected && <Check className="w-3 h-3 text-emerald-600" />}
                             {role}
                           </button>
                         );
@@ -544,7 +544,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-end gap-4 pt-2">
                 <Link
                   to="/dashboard"
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-400 hover:text-white"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900"
                 >
                   Cancel
                 </Link>
@@ -565,46 +565,46 @@ export default function ProfilePage() {
             <div className="space-y-6">
               
               {/* Status 1: Resume Status */}
-              <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-4">
+              <div className="rounded-2xl bg-white border border-stone-200/90 shadow-sm p-6 space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400">
+                  <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-slate-600">
                     <FileText className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white">Resume Document</h3>
-                    <p className="text-[11px] text-slate-400">Supabase Storage</p>
+                    <h3 className="text-sm font-bold text-slate-900">Resume Document</h3>
+                    <p className="text-[11px] text-slate-500">Supabase Storage</p>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs text-amber-400 font-semibold">
-                    <AlertCircle className="w-3.5 h-3.5" />
+                <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs text-amber-700 font-semibold">
+                    <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
                     <span>No Resume Uploaded</span>
                   </div>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-600">
                     Resume upload and storage integration will be enabled in the upcoming resume ingestion phase.
                   </p>
                 </div>
               </div>
 
               {/* Status 2: AI Profile Status */}
-              <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-4">
+              <div className="rounded-2xl bg-white border border-stone-200/90 shadow-sm p-6 space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white">AI Candidate Profile</h3>
-                    <p className="text-[11px] text-slate-400">Google Cloud Vertex AI</p>
+                    <h3 className="text-sm font-bold text-slate-900">AI Candidate Profile</h3>
+                    <p className="text-[11px] text-slate-500">Google Cloud Vertex AI</p>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-1">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-300 font-semibold">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="p-3 rounded-xl bg-stone-50 border border-stone-200/80 space-y-1">
+                  <div className="flex items-center gap-1.5 text-xs text-slate-700 font-semibold">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Awaiting Resume Analysis</span>
                   </div>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-600">
                     Structured skill extraction and project evaluation will automatically run with Vertex AI once your resume is uploaded.
                   </p>
                 </div>

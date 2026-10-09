@@ -1,54 +1,60 @@
 import React from 'react';
-import { FileText, Compass, BarChart3, AlertCircle, MessageSquareText } from 'lucide-react';
+import { FileText, Compass, BarChart3, AlertCircle, MessageSquareText, SlidersHorizontal } from 'lucide-react';
 
 const FEATURES = [
   {
     icon: FileText,
-    title: 'Resume-Aware Matching',
+    title: 'Resume Intelligence',
     description:
-      'Rather than relying on keywords or self-reported checkboxes, our model evaluates your complete educational background, technical projects, and coursework.'
+      'Understand your skills, projects, experience, and career profile directly from your uploaded resume.'
   },
   {
     icon: Compass,
-    title: 'Live Opportunity Discovery',
+    title: 'Personalized Discovery',
     description:
-      'Integrated with Context.dev web research to discover live, active internships and entry-level positions directly from company career sites and verified sources.'
+      'Find opportunities aligned with your background, career interests, and preferred job locations.'
   },
   {
     icon: BarChart3,
-    title: 'AI Match Scores',
+    title: 'Smart Matching',
     description:
-      'Transparent fit scores provide an objective benchmark of how closely your technical skill set matches the job requirements.'
+      'Understand how closely an opportunity fits your current profile with clear compatibility scores.'
   },
   {
     icon: AlertCircle,
-    title: 'Skill-Gap Identification',
+    title: 'Skill Gap Insights',
     description:
-      'Pinpoints the precise technologies or prerequisites you are missing, so you know exactly what to study before interviewing.'
+      'See which skills align with an opportunity and where you may need to learn or improve.'
   },
   {
     icon: MessageSquareText,
-    title: 'Personalized Explanations',
+    title: 'Clear Recommendations',
     description:
-      'Clear, written breakdowns explain why a role was recommended and provide tailored context to boost your application confidence.'
+      'Get a clear, transparent explanation of why an opportunity may or may not be a good fit for you.'
+  },
+  {
+    icon: SlidersHorizontal,
+    title: 'Focused Search',
+    description:
+      'Filter and sort opportunities by work mode, job type, and match score so you spend less time searching and more time applying.'
   }
 ];
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="py-20 bg-slate-900/40 border-y border-slate-800/80">
+    <section id="features" className="py-20 md:py-28 bg-[#fafaf9] border-b border-stone-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-16">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">
-            Platform Capabilities
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/60">
+            Features
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Designed specifically for student placement preparation
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            Designed for thoughtful placement preparation
           </h2>
-          <p className="text-base sm:text-lg text-slate-400 leading-relaxed">
-            Every feature in CareerLens is engineered to minimize searching time and maximize your application clarity.
+          <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
+            Every capability in CareerLens is focused on giving you clarity, saving your time, and helping you apply with confidence.
           </p>
         </div>
 
@@ -59,15 +65,15 @@ export default function FeaturesSection() {
             return (
               <div
                 key={idx}
-                className="rounded-2xl bg-slate-900 border border-slate-800 p-6 space-y-4 hover:border-slate-700 transition-all hover:translate-y-[-2px]"
+                className="rounded-2xl bg-white border border-stone-200/90 p-7 space-y-4 hover:border-emerald-300 hover:shadow-md hover:shadow-stone-200/60 transition-all hover:translate-y-[-2px]"
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <div className="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-700 shadow-2xs">
                   <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-lg font-bold text-slate-900">
                   {feat.title}
                 </h3>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   {feat.description}
                 </p>
               </div>

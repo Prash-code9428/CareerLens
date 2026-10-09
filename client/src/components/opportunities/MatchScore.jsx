@@ -8,33 +8,33 @@ export default function MatchScore({ score, recommendation, size = 'default' }) 
     const effectiveScore = val ?? 0;
     if (rec === 'Strong Match' || effectiveScore >= 85) {
       return {
-        badgeBg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
-        scoreText: 'text-emerald-400',
-        dot: 'bg-emerald-400',
-        glow: 'shadow-emerald-500/20'
+        badgeBg: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+        scoreText: 'text-emerald-700',
+        dot: 'bg-emerald-600',
+        glow: 'shadow-2xs'
       };
     }
     if (rec === 'Good Match' || effectiveScore >= 70) {
       return {
-        badgeBg: 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400',
-        scoreText: 'text-cyan-400',
-        dot: 'bg-cyan-400',
-        glow: 'shadow-cyan-500/20'
+        badgeBg: 'bg-teal-50 border-teal-200 text-teal-800',
+        scoreText: 'text-teal-700',
+        dot: 'bg-teal-600',
+        glow: 'shadow-2xs'
       };
     }
     if (rec === 'Possible Match' || effectiveScore >= 50) {
       return {
-        badgeBg: 'bg-amber-500/10 border-amber-500/30 text-amber-400',
-        scoreText: 'text-amber-400',
-        dot: 'bg-amber-400',
-        glow: 'shadow-amber-500/20'
+        badgeBg: 'bg-amber-50 border-amber-200 text-amber-800',
+        scoreText: 'text-amber-700',
+        dot: 'bg-amber-600',
+        glow: 'shadow-2xs'
       };
     }
     return {
-      badgeBg: 'bg-slate-800/80 border-slate-700 text-slate-400',
-      scoreText: 'text-slate-400',
-      dot: 'bg-slate-500',
-      glow: 'shadow-transparent'
+      badgeBg: 'bg-stone-100 border-stone-200 text-slate-600',
+      scoreText: 'text-slate-600',
+      dot: 'bg-slate-400',
+      glow: 'shadow-none'
     };
   };
 
@@ -43,7 +43,7 @@ export default function MatchScore({ score, recommendation, size = 'default' }) 
   return (
     <div className="flex items-center gap-2">
       {numericScore !== null && (
-        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 shadow-sm ${style.glow}`}>
+        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-stone-200 shadow-2xs ${style.glow}`}>
           <Zap className={`w-3.5 h-3.5 ${style.scoreText}`} />
           <span className={`text-sm font-extrabold ${style.scoreText}`}>
             {numericScore}%
@@ -53,7 +53,7 @@ export default function MatchScore({ score, recommendation, size = 'default' }) 
 
       {recommendation && (
         <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-semibold ${style.badgeBg}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${style.dot} animate-pulse`} />
+          <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
           <span>{recommendation}</span>
         </div>
       )}

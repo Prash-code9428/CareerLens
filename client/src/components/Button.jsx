@@ -13,7 +13,7 @@ export default function Button({
   className = '',
   icon: Icon
 }) {
-  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const sizeStyles = {
     sm: 'px-3 py-1.5 text-xs gap-1.5',
@@ -22,10 +22,10 @@ export default function Button({
   };
 
   const variantStyles = {
-    primary: 'bg-emerald-400 text-slate-950 hover:bg-emerald-300 active:bg-emerald-500 focus:ring-emerald-400 shadow-md shadow-emerald-500/15',
-    secondary: 'bg-slate-800 text-slate-100 hover:bg-slate-700 active:bg-slate-800 focus:ring-slate-600 border border-slate-700',
-    outline: 'bg-transparent text-slate-200 border border-slate-800 hover:bg-slate-900 hover:border-slate-700 focus:ring-slate-700',
-    danger: 'bg-rose-500 text-white hover:bg-rose-600 active:bg-rose-700 focus:ring-rose-500'
+    primary: 'bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 focus:ring-emerald-500 shadow-sm shadow-emerald-700/15',
+    secondary: 'bg-white text-slate-700 hover:bg-stone-50 active:bg-stone-100 focus:ring-stone-300 border border-stone-200/90 hover:border-stone-300 shadow-2xs',
+    outline: 'bg-transparent text-slate-700 border border-stone-300 hover:bg-stone-100 focus:ring-stone-300',
+    danger: 'bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 focus:ring-rose-500 shadow-sm'
   };
 
   const isButtonDisabled = disabled || loading;

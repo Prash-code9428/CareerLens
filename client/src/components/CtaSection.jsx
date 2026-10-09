@@ -4,35 +4,39 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 
 export default function CtaSection() {
   return (
-    <section className="py-20 relative overflow-hidden bg-slate-900/60 border-t border-slate-800/80">
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Ready for Placement Season</span>
+    <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#fafaf9] via-stone-50 to-stone-100/70 border-t border-stone-200/80">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-7">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-xs">
+          <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+          <span>Intelligent Career Discovery</span>
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-            Stop searching. <span className="text-emerald-400">Start matching.</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+            Stop searching. <span className="text-emerald-700">Start matching.</span>
           </h2>
-          <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Upload your resume and let CareerLens research live opportunities tailored to your unique technical background.
+          <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Upload your resume and let CareerLens discover relevant opportunities tailored to your actual skills and experience.
           </p>
         </div>
 
-        <div className="pt-2">
+        <div className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             to="/register"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 active:bg-emerald-500 transition-all shadow-xl shadow-emerald-500/25 text-base"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition-all shadow-md shadow-emerald-700/10 text-base"
           >
-            Build Your Career Profile
-            <ArrowRight className="w-5 h-5" />
+            Get Started Free
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <Link
+            to="/login"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-medium text-slate-700 bg-white hover:bg-stone-100 border border-stone-200 transition-all text-base"
+          >
+            Sign In to Account
           </Link>
         </div>
       </div>
     </section>
   );
 }
+

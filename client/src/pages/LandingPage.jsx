@@ -1,7 +1,6 @@
 import React from 'react';
 import Navbar from '../components/Navbar.jsx';
 import Hero from '../components/Hero.jsx';
-import ProblemSection from '../components/ProblemSection.jsx';
 import HowItWorksSection from '../components/HowItWorksSection.jsx';
 import FeaturesSection from '../components/FeaturesSection.jsx';
 import WhySection from '../components/WhySection.jsx';
@@ -10,11 +9,10 @@ import Footer from '../components/Footer.jsx';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+    <div className="min-h-screen bg-[#fafaf9] text-slate-900 flex flex-col selection:bg-emerald-200 selection:text-emerald-950 font-sans antialiased">
       <Navbar />
       <main className="flex-grow">
         <Hero />
-        <ProblemSection />
         <HowItWorksSection />
         <FeaturesSection />
         <WhySection />
@@ -24,3 +22,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
